@@ -110,24 +110,32 @@ h3{font-size:clamp(26px,2.7vw,45px);line-height:.98;letter-spacing:-.045em;font-
 .node{position:absolute;min-width:112px;text-align:center;padding:13px 15px;border:1px solid var(--line2);background:rgba(9,11,10,.88);border-radius:999px;font:700 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:rgba(247,243,234,.78)}
 .node.main{left:50%;top:50%;transform:translate(-50%,-50%);background:var(--soft);color:var(--paperInk);border-color:transparent}
 .n1{left:8%;top:16%}.n2{right:6%;top:16%}.n3{left:8%;bottom:16%}.n4{right:5%;bottom:17%}.n5{left:42%;top:6%}.n6{left:42%;bottom:6%}
-.benchmark{grid-column:1/13;grid-row:2/8;display:grid;grid-template-columns:1.28fr repeat(5,1fr);grid-auto-rows:minmax(64px,1fr);border:1px solid var(--paperLine);background:#fffaf0}
-.bcell{border-right:1px solid var(--paperLine);border-bottom:1px solid var(--paperLine);padding:14px;display:flex;align-items:center;justify-content:center;text-align:center}
+.benchWrap{grid-column:1/13;grid-row:2/9;display:grid;grid-template-rows:auto 1fr auto;gap:16px;min-height:0}
+.benchLead{font-size:clamp(22px,2.1vw,34px);line-height:1.15;letter-spacing:-.04em;font-weight:760;color:rgba(16,18,15,.78);max-width:920px}
+.benchmark{display:grid;grid-template-columns:1.45fr repeat(5,1fr);border:1px solid var(--paperLine);background:#fffaf0}
+.bcell{border-right:1px solid var(--paperLine);border-bottom:1px solid var(--paperLine);padding:12px 10px;display:flex;align-items:center;justify-content:center;text-align:center;min-height:58px}
 .bcell:nth-child(6n){border-right:0}
-.bhead{font:800 11px var(--mono);letter-spacing:.11em;text-transform:uppercase;color:rgba(16,18,15,.58);background:#eee7da}
-.feat{justify-content:flex-start;text-align:left;font:800 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(16,18,15,.7);background:#f7f1e7}
-.pill{height:10px;width:74%;border-radius:999px;background:rgba(16,18,15,.1);overflow:hidden}
-.pill i{display:block;height:100%;width:var(--v);border-radius:inherit;background:rgba(16,18,15,.46)}
-.matrixLegend{grid-column:1/13;grid-row:8/9;align-self:end;display:flex;gap:18px;align-items:center;justify-content:flex-end;color:rgba(16,18,15,.52);font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase}
-.legendLine{height:1px;width:48px;background:rgba(16,18,15,.25)}
-.statement{grid-column:2/12;grid-row:2/8;display:flex;flex-direction:column;justify-content:center;gap:28px}
-.statement p{font-size:clamp(40px,4.6vw,78px);line-height:1.02;letter-spacing:-.06em;font-weight:780}
-.statement em{font-style:normal;color:#9d4f34}
+.bhead{font:800 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:rgba(16,18,15,.58);background:#eee7da}
+.feat{justify-content:flex-start;text-align:left;font:800 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:rgba(16,18,15,.7);background:#f7f1e7;padding-left:16px}
+.mark{font:800 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:7px 10px;min-width:86px}
+.mark.yes{background:#9d4f34;color:#fffaf0}
+.mark.mid{background:#eee7da;color:#9d4f34;border:1px solid rgba(157,79,52,.3)}
+.mark.no{color:rgba(16,18,15,.34);border:1px solid rgba(16,18,15,.12)}
+.benchFind{border-top:1px solid var(--paperLine);padding-top:16px;display:flex;gap:16px;align-items:baseline;flex-wrap:wrap}
+.benchFind b{font:800 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#9d4f34}
+.benchFind span{font-size:clamp(18px,1.5vw,26px);line-height:1.2;letter-spacing:-.03em;color:rgba(16,18,15,.76)}
+.statement{grid-column:3/11;grid-row:2/8;display:flex;flex-direction:column;justify-content:center;gap:0}
+.statementBlock{padding:22px 0;border-top:1px solid var(--paperLine);display:grid;gap:8px}
+.statementBlock:last-child{border-bottom:1px solid var(--paperLine)}
+.statementBlock b{font:800 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#9d4f34}
+.statementBlock p{font-size:clamp(22px,2.35vw,36px);line-height:1.2;letter-spacing:-.04em;font-weight:700;color:rgba(16,18,15,.82)}
+.statementNote{margin-top:22px;font:500 13px/1.45 var(--mono);letter-spacing:.03em;color:rgba(16,18,15,.48)}
 @media(max-width:900px){
   .slide{padding:36px;display:block;overflow:auto}
-  .coverTitle,.coverPanel,.headRow,.headlineSplit,.demandGrid,.evidence,.personaPhoto,.personaFacts,.empathyMap,.timeline,.network,.benchmark,.statement{display:block;margin-bottom:24px}
+  .coverTitle,.coverPanel,.headRow,.headlineSplit,.demandGrid,.evidence,.personaPhoto,.personaFacts,.empathyMap,.timeline,.network,.benchWrap,.statement{display:block;margin-bottom:24px}
   .counter,.brand{display:none}
   .personaFacts,.empathyMap,.evidence,.demandGrid{grid-template-columns:1fr}
-  .benchmark{overflow:auto}
+  .benchmark{overflow:auto;min-width:720px}
   .bcell{min-height:54px}
   .personaPhoto{height:420px}
   .empathyCenter{display:none}
@@ -228,45 +236,42 @@ h3{font-size:clamp(26px,2.7vw,45px);line-height:.98;letter-spacing:-.045em;font-
 
 <section class="slide paper" data-title="Benchmark">
   <div class="headRow"><div class="kicker reveal">Benchmarking</div></div>
-  <div class="benchmark reveal d1">
-    <div class="bcell bhead"></div>
-    <div class="bcell bhead">Maps</div>
-    <div class="bcell bhead">Moovit</div>
-    <div class="bcell bhead">Cittamobi</div>
-    <div class="bcell bhead">Uber / 99</div>
-    <div class="bcell bhead">Rota 77</div>
-    <div class="bcell feat">Ônibus em tempo real</div>
-    <div class="bcell"><span class="pill"><i style="--v:70%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:90%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:80%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:0%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:0%"></i></span></div>
-    <div class="bcell feat">Corrida por app</div>
-    <div class="bcell"><span class="pill"><i style="--v:35%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:10%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:0%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:100%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:95%"></i></span></div>
-    <div class="bcell feat">Comparar modais</div>
-    <div class="bcell"><span class="pill"><i style="--v:65%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:55%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:25%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:10%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:10%"></i></span></div>
-    <div class="bcell feat">Dados locais de Ijuí</div>
-    <div class="bcell"><span class="pill"><i style="--v:15%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:20%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:25%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:40%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:85%"></i></span></div>
-    <div class="bcell feat">Tudo em um só lugar</div>
-    <div class="bcell"><span class="pill"><i style="--v:40%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:35%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:20%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:10%"></i></span></div>
-    <div class="bcell"><span class="pill"><i style="--v:15%"></i></span></div>
+  <div class="benchWrap">
+    <p class="benchLead reveal d1">Cada app resolve um pedaço. Nenhum resolve a decisão completa em Ijuí.</p>
+    <div class="benchmark reveal d2">
+      <div class="bcell bhead">O que oferece</div>
+      <div class="bcell bhead">Maps</div>
+      <div class="bcell bhead">Moovit</div>
+      <div class="bcell bhead">Cittamobi</div>
+      <div class="bcell bhead">Uber / 99</div>
+      <div class="bcell bhead">Rota 77</div>
+      <div class="bcell feat">Ônibus em tempo real</div>
+      <div class="bcell"><span class="mark mid">parcial</span></div>
+      <div class="bcell"><span class="mark yes">sim</span></div>
+      <div class="bcell"><span class="mark yes">sim</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell feat">Corrida por aplicativo</div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark yes">sim</span></div>
+      <div class="bcell"><span class="mark yes">sim</span></div>
+      <div class="bcell feat">Comparar ônibus e corrida</div>
+      <div class="bcell"><span class="mark mid">parcial</span></div>
+      <div class="bcell"><span class="mark mid">parcial</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell feat">Dados reais de Ijuí</div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark mid">parcial</span></div>
+      <div class="bcell"><span class="mark mid">parcial</span></div>
+      <div class="bcell"><span class="mark yes">sim</span></div>
+    </div>
+    <div class="benchFind reveal d3"><b>leitura</b><span>A lacuna é a integração: ônibus, corrida e contexto local não aparecem juntos.</span></div>
   </div>
-  <div class="matrixLegend reveal d2"><span class="legendLine"></span><span>Lacuna: ninguém integra ônibus, corrida e contexto local da cidade</span></div>
 </section>
 
 <section class="slide" data-title="Stakeholders">
@@ -338,8 +343,10 @@ h3{font-size:clamp(26px,2.7vw,45px);line-height:.98;letter-spacing:-.045em;font-
 <section class="slide paper" data-title="Problema">
   <div class="headRow"><div class="kicker reveal">Problem Statement</div></div>
   <div class="statement">
-    <p class="reveal d1">Cidadãos de Ijuí precisam de uma forma <em>simples e confiável</em> de decidir como se deslocar, porque tempo, custo, disponibilidade e rota aparecem hoje de forma <em>fragmentada</em>.</p>
-    <p class="small reveal d2">Síntese do briefing, da pesquisa documental e da lacuna encontrada no benchmarking. A validação em campo deve confirmar a recorrência dessas dores.</p>
+    <div class="statementBlock reveal d1"><b>quem</b><p>Cidadãos de Ijuí que se deslocam no dia a dia.</p></div>
+    <div class="statementBlock reveal d2"><b>precisa</b><p>De uma forma simples e confiável de decidir como chegar ao destino.</p></div>
+    <div class="statementBlock reveal d3"><b>porque</b><p>Tempo, custo, disponibilidade e rota aparecem hoje de forma fragmentada.</p></div>
+    <p class="statementNote reveal d4">Síntese do briefing, da pesquisa documental e do benchmarking. A validação em campo deve confirmar a recorrência dessas dores.</p>
   </div>
 </section>
 
