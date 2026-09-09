@@ -59,6 +59,7 @@ h3{font-size:clamp(26px,2.7vw,45px);line-height:.98;letter-spacing:-.045em;font-
 .routeLabel span{font:600 12px var(--mono);letter-spacing:.12em;color:rgba(247,243,234,.54);text-transform:uppercase}
 .headRow{grid-column:1/13;grid-row:1/2;display:flex;flex-direction:column;justify-content:end;gap:12px}
 .headRow.tall{grid-row:1/3}
+.empathyHead{flex-direction:row;align-items:end;justify-content:space-between}
 .headlineSplit{grid-column:1/8;grid-row:2/7;display:flex;flex-direction:column;justify-content:center;gap:28px}
 .demandGrid{grid-column:1/13;grid-row:3/9;display:grid;grid-template-columns:1.12fr 1fr 1fr;gap:18px}
 .demandCard{border:1px solid var(--line);padding:28px;display:flex;flex-direction:column;justify-content:space-between;background:rgba(247,243,234,.03)}
@@ -87,14 +88,18 @@ h3{font-size:clamp(26px,2.7vw,45px);line-height:.98;letter-spacing:-.045em;font-
 .fact small{font-size:14px;line-height:1.35;color:rgba(16,18,15,.52);max-width:260px}
 .personaIntro{grid-column:1/13;grid-row:1/2;align-self:start;display:flex;align-items:center;justify-content:space-between}
 .personaIntro .small{max-width:520px;text-align:right}
-.empathyMap{grid-column:1/13;grid-row:2/8;display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.empathyItem{background:#fffaf0;border:1px solid var(--paperLine);padding:30px;display:flex;flex-direction:column;justify-content:space-between;min-height:430px}
-.empathyItem h3{font-size:44px}
-.empathyItem p{font-size:25px;line-height:1.14;letter-spacing:-.045em;color:rgba(16,18,15,.72)}
-.empathyItem:nth-child(2){margin-top:52px}
-.empathyItem:nth-child(3){margin-top:104px}
-.empathyItem:nth-child(4){margin-top:30px}
-.empathyCenter{position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);font:800 12px var(--mono);letter-spacing:.16em;text-transform:uppercase;background:#111411;color:#f7f3ea;border-radius:999px;padding:14px 18px;box-shadow:0 18px 44px rgba(0,0,0,.22)}
+.empathyMap{grid-column:1/13;grid-row:2/9;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:14px;min-height:0}
+.empathyItem{background:#fffaf0;border:1px solid var(--paperLine);padding:22px 24px;display:flex;flex-direction:column;gap:12px;min-height:0}
+.empathyItem h3{font-size:clamp(18px,1.55vw,26px);letter-spacing:-.04em}
+.empathyItem ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.empathyItem li{font-size:clamp(14px,1.05vw,18px);line-height:1.3;letter-spacing:-.02em;color:rgba(16,18,15,.68);padding-left:16px;position:relative}
+.empathyItem li:before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;border-radius:999px;background:#9d4f34}
+.empathyItem.pain{background:#111411;color:#f7f3ea;border-color:transparent}
+.empathyItem.pain h3{color:#c8744e}
+.empathyItem.pain li{color:rgba(247,243,234,.72)}
+.empathyItem.pain li:before{background:#c8744e}
+.empathyItem.need{border-color:#9d4f34}
+.personaChip{font:700 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:rgba(16,18,15,.46);border:1px solid var(--paperLine);padding:8px 12px;border-radius:999px;white-space:nowrap}
 .timeline{grid-column:1/13;grid-row:3/7;position:relative;display:grid;grid-template-columns:repeat(6,1fr);align-items:center}
 .timeline:before{content:"";position:absolute;left:5%;right:5%;top:50%;height:2px;background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),transparent)}
 .stop{position:relative;z-index:2;display:grid;gap:16px;align-content:center;text-align:center}
@@ -138,7 +143,6 @@ h3{font-size:clamp(26px,2.7vw,45px);line-height:.98;letter-spacing:-.045em;font-
   .benchmark{overflow:auto;min-width:720px}
   .bcell{min-height:54px}
   .personaPhoto{height:420px}
-  .empathyCenter{display:none}
 }
 </style>
 </head>
@@ -307,13 +311,59 @@ h3{font-size:clamp(26px,2.7vw,45px);line-height:.98;letter-spacing:-.045em;font-
 </section>
 
 <section class="slide paper" data-title="Empatia">
-  <div class="headRow"><div class="kicker reveal">Mapa de empatia</div></div>
-  <div class="empathyCenter">Lucas</div>
+  <div class="headRow empathyHead">
+    <div class="kicker reveal">Mapa de empatia</div>
+    <span class="personaChip reveal">Lucas • 27 • hipótese do briefing</span>
+  </div>
   <div class="empathyMap reveal d1">
-    <div class="empathyItem"><h3>Pensa</h3><p>“Será que chego no horário sem gastar demais?”</p></div>
-    <div class="empathyItem"><h3>Vê</h3><p>Apps separados, pontos de ônibus, trânsito e preços variáveis.</p></div>
-    <div class="empathyItem"><h3>Faz</h3><p>Consulta mapas, horários, corridas e pergunta para outras pessoas.</p></div>
-    <div class="empathyItem"><h3>Sente</h3><p>Incerteza, pressa e pouco controle sobre o tempo total.</p></div>
+    <article class="empathyItem">
+      <h3>Vê</h3>
+      <ul>
+        <li>Apps de corrida, mapa e horário abertos ao mesmo tempo</li>
+        <li>Ponto sem previsão de quando o ônibus passa</li>
+        <li>Preço da corrida mudando na tela</li>
+      </ul>
+    </article>
+    <article class="empathyItem">
+      <h3>Ouve</h3>
+      <ul>
+        <li>“O ônibus atrasou de novo”</li>
+        <li>Dica no grupo da turma ou de quem está no ponto</li>
+        <li>Motorista falando de cancelamento e demanda</li>
+      </ul>
+    </article>
+    <article class="empathyItem">
+      <h3>Fala e faz</h3>
+      <ul>
+        <li>“Vou ver se dá tempo”</li>
+        <li>Alterna Maps, ônibus e Rota 77 / 99</li>
+        <li>Troca de ônibus para corrida se estiver atrasado</li>
+      </ul>
+    </article>
+    <article class="empathyItem">
+      <h3>Pensa e sente</h3>
+      <ul>
+        <li>“Chego no horário sem gastar demais?”</li>
+        <li>Pressa, incerteza e pouco controle sobre o tempo</li>
+        <li>Medo de perder aula ou o trabalho</li>
+      </ul>
+    </article>
+    <article class="empathyItem pain">
+      <h3>Dores</h3>
+      <ul>
+        <li>Informação espalhada em vários lugares</li>
+        <li>Espera sem previsibilidade</li>
+        <li>Comparar tempo e custo na mão, tarde demais</li>
+      </ul>
+    </article>
+    <article class="empathyItem need">
+      <h3>Necessidades</h3>
+      <ul>
+        <li>Ver tempo, custo e disponibilidade juntos</li>
+        <li>Confiar que a opção escolhida vai acontecer</li>
+        <li>Decidir rápido, no contexto de agora</li>
+      </ul>
+    </article>
   </div>
 </section>
 
