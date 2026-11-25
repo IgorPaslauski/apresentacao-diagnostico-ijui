@@ -1,0 +1,89 @@
+/* Move Ijuí — modo escuro
+   Cores tiradas do painel "Cores do Move Ijuí › Modo escuro" da prancha (app.svg).
+   Ativa sozinho quando o celular está no tema escuro, ou à força com <html data-theme="dark">.
+   O verde vira duas cores: --brand (texto/acento, verde claro) e --brand-fill (fundo de botões). */
+
+:root { --brand-fill: var(--brand); }
+
+/* Os mesmos valores, para o tema automático e para o forçado */
+:root[data-theme="dark"] {
+  --bg: #0B1C30;          /* Fundo da tela */
+  --card: #13283D;        /* Cards */
+  --soft: #1A3350;        /* Superfície suave */
+  --neutral-soft: #1A3350;
+  --brand: #A5F4C0;       /* Texto da marca */
+  --brand-fill: #1B6B43;  /* Botão e marca */
+  --brand-2: #00522F;     /* Destaque verde */
+  --brand-soft: #123A2B;
+  --info-bg: #1C2F6E;     /* Aviso informativo */
+  --alert-bg: #3D2208;    /* Alerta */
+  --err-bg: #4A1212;      /* Erro suave */
+  --ink: #F8F9FF;         /* Texto principal */
+  --ink-2: #BFC9BF;       /* Texto secundário */
+  --ink-3: #9AA59C;       /* Texto auxiliar */
+  --link: #DCE9FF;        /* Link e informação */
+  --warn: #FFB77D;        /* Aviso */
+  --err: #FF8A80;         /* Acento de erro */
+  --line: #3F4941;        /* Borda */
+  --line-soft: #22384F;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .25), 0 8px 24px -14px rgba(0, 0, 0, .6);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B1C30; --card: #13283D; --soft: #1A3350; --neutral-soft: #1A3350;
+    --brand: #A5F4C0; --brand-fill: #1B6B43; --brand-2: #00522F; --brand-soft: #123A2B;
+    --info-bg: #1C2F6E; --alert-bg: #3D2208; --err-bg: #4A1212;
+    --ink: #F8F9FF; --ink-2: #BFC9BF; --ink-3: #9AA59C; --link: #DCE9FF; --warn: #FFB77D; --err: #FF8A80;
+    --line: #3F4941; --line-soft: #22384F;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .25), 0 8px 24px -14px rgba(0, 0, 0, .6);
+    color-scheme: dark;
+  }
+}
+
+/* ---------- Ajustes de componentes ----------
+   Ficam sob .dark, classe que o app.js coloca no <html> quando o tema efetivo é escuro. */
+.dark .appbar, .dark .tabbar { background: rgba(11, 28, 48, .88); }
+.dark .tabbar { border-top-color: #1F3550; }
+.dark .card, .dark .tile, .dark .search { border-color: #1F3550; }
+.dark .list > .item + .item { border-top-color: #1F3550; }
+.dark [style*="background:#EEF1F5"] { background: #1F3550 !important; }
+.dark .stats { background: #1F3550; }
+.dark .steps .st::before, .dark .step-bar { background: #1F3550; }
+
+/* Verde de fundo (botões, selos, marcadores) usa o "Botão e marca" escuro com texto claro */
+.dark .btn.primary, .dark .icon-sq.brand, .dark .chip.dark, .dark .steps .dot.on, .dark .tag-map.dark,
+.dark .seg .chip.on, .dark .choices button.on, .dark .toggle.on, .dark .pin.big .bubble, .dark .pin.me .bubble,
+.dark [style*="background:var(--brand)"] { background: var(--brand-fill) !important; color: #F8F9FF; }
+.dark .btn.primary { box-shadow: 0 6px 16px -8px rgba(0, 0, 0, .6); }
+.dark .chip.green { background: var(--brand-soft); color: var(--brand); }
+.dark .chip.alert, .dark [style*="background:#FFF1E6"] { background: var(--alert-bg) !important; color: var(--warn) !important; }
+
+/* Mapa: imagem mais escura para não ofuscar; etiquetas e botões no tom de card */
+.dark .map img.bg { filter: brightness(.62) saturate(.75) contrast(1.05); }
+.dark .map .fade { background: linear-gradient(to bottom, transparent, rgba(11, 28, 48, .95)); }
+.dark .tag-map, .dark .map-btn, .dark .pin .bubble { background: var(--card); color: var(--ink); }
+.dark .pin .bubble { color: var(--brand); }
+.dark .map-btn[style*="background:var(--brand)"] { color: #F8F9FF; }
+
+/* Elementos que usavam o texto principal como fundo escuro (toast, aviso de rede) */
+.dark .toast, .dark .offline { background: #22384F; color: var(--ink); box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .7); }
+.dark .plate { background: #F8F9FF; color: #0B1C30; }
+
+.dark .toggle { background: #3F4941; }
+.dark .icon-sq.round[style*="background:#fff;"] { background: var(--soft) !important; }
+.dark #test .t-field input { background: var(--card); border-color: #1F3550; color: var(--ink); }
+.dark #test .t-pill { background: #22384F; }
+.dark #test .t-table th, .dark #test .t-table td { border-color: #1F3550; }
+.dark .logo { background: #fff; }
+.dark body { background: var(--bg); }
+
+/* Troca de tema suave */
+.theme-anim, .theme-anim * { transition: background-color .35s ease, color .35s ease, border-color .35s ease !important; }
+
+/* Categoria selecionada (tela 10) */
+.dark [data-pick] > .card.on-pick { background: var(--brand-soft); border-color: rgba(165, 244, 192, .35); }
+
+/* Padrões novos (Uber / 99 / Rota 77) no escuro */
+.dark .pay { border-color: var(--line-soft); }
+.dark .redeem button { border-color: var(--line-soft); }

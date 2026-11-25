@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Resultados do teste · Move Ijuí</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+  :root { --brand:#00522f; --brand-soft:#e3f1e8; --ink:#0b1c30; --muted:#66758a; --faint:#94a1b2; --line:#e4e9f0; --err:#ba1a1a; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.5 "Plus Jakarta Sans", system-ui, sans-serif; color:var(--ink); background:#f4f7f5; }
+  main { max-width:1080px; margin:0 auto; padding:56px 40px 96px; }
+  h1 { font-size:28px; margin:0 0 6px; letter-spacing:-.01em; }
+  .sub { color:var(--muted); margin:0 0 40px; }
+  h2 { font-size:17px; margin:48px 0 16px; }
+  .cards { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:18px; padding:24px; }
+  .card .t { font-weight:600; margin-bottom:16px; }
+  .kpis { display:grid; grid-template-columns:1fr 1fr; gap:14px 12px; }
+  .kpi .v { font-size:24px; font-weight:800; line-height:1.2; }
+  .kpi .l { font-size:12px; color:var(--muted); }
+  .bar { height:6px; border-radius:6px; background:#e6ebf1; margin-top:16px; overflow:hidden; }
+  .bar i { display:block; height:100%; background:var(--brand); border-radius:6px; }
+  table { width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); border-radius:18px; overflow:hidden; font-size:14px; }
+  th { text-align:left; font-size:12px; color:var(--muted); font-weight:600; padding:12px 16px; background:#fafbfc; border-bottom:1px solid var(--line); }
+  td { padding:12px 16px; border-bottom:1px solid #eef1f5; vertical-align:top; }
+  tr:last-child td { border-bottom:0; }
+  td.path { color:var(--muted); font-size:12px; max-width:320px; }
+  .ok { color:var(--brand); font-weight:700; } .no { color:var(--err); font-weight:700; }
+  .actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:32px; }
+  button, .btn { font:inherit; font-size:14px; font-weight:600; border:0; border-radius:999px; padding:10px 20px; cursor:pointer; text-decoration:none; }
+  .primary { background:var(--brand); color:#fff; }
+  .ghost { background:#fff; border:1px solid var(--line); color:var(--ink); }
+  .danger { background:none; color:var(--err); }
+  .empty { background:#fff; border:1px dashed var(--line); border-radius:18px; padding:48px; text-align:center; color:var(--muted); }
+  @media (max-width: 800px) { main { padding:32px 20px 64px; } .cards { grid-template-columns:1fr; } td.path { display:none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Resultados do teste de usabilidade</h1>
+  <p class="sub">Sessões feitas neste navegador com <b>app/index.html?teste</b>. Para juntar testes de outros aparelhos, cole os CSVs na sua planilha.</p>
+  <div id="out"></div>
+</main>
+<script>
+const KEY = "moveIjuiTestes";
+const TASKS = ["Ir de ônibus ao campus", "Pedir um carro para o HCI", "Descobrir se a linha está atrasada"];
+const data = JSON.parse(localStorage.getItem(KEY) || "[]");
+const out = document.getElementById("out");
+const avg = a => a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0;
+const fmt = (v, d = 1) => v.toLocaleString("pt-BR", { maximumFractionDigits: d });
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function csv() {
+  const head = ["participante", "data", "tarefa", "sucesso", "tempo_s", "toques", "voltar", "telas"];
+  const q = v => `"${String(v).replace(/"/g, '""')}"`;
+  return [head.join(","), ...data.flatMap(s => s.tarefas.map(r => [s.participante, s.data, r.tarefa, r.sucesso ? "sim" : "nao", r.tempo_s, r.toques, r.voltar, r.telas].map(q).join(",")))].join("\n");
+}
+
+if (!data.length) {
+  out.innerHTML = `<div class="empty">Nenhuma sessão ainda.<br><br><a class="btn primary" href="app/index.html?teste">Começar um teste</a></div>`;
+} else {
+  const cards = TASKS.map((name, i) => {
+    const rows = data.map(s => s.tarefas[i]).filter(Boolean);
+    const ok = rows.filter(r => r.sucesso);
+    const rate = rows.length ? ok.length / rows.length : 0;
+    return `<div class="card"><div class="t">${i + 1}. ${name}</div>
+      <div class="kpis">
+        <div class="kpi"><div class="v">${fmt(rate * 100, 0)}%</div><div class="l">concluíram</div></div>
+        <div class="kpi"><div class="v">${ok.length ? fmt(avg(ok.map(r => r.tempo_s))) + "s" : "—"}</div><div class="l">tempo médio (quem concluiu)</div></div>
+        <div class="kpi"><div class="v">${fmt(avg(rows.map(r => r.toques)))}</div><div class="l">toques em média</div></div>
+        <div class="kpi"><div class="v">${fmt(avg(rows.map(r => r.voltar)))}</div><div class="l">vezes que voltou</div></div>
+      </div>
+      <div class="bar"><i style="width:${rate * 100}%"></i></div></div>`;
+  }).join("");
+  const table = data.flatMap(s => s.tarefas.map(r => `<tr><td>${esc(s.participante)}</td><td>${esc(r.tarefa)}</td>
+    <td class="${r.sucesso ? "ok" : "no"}">${r.sucesso ? "Concluiu" : "Desistiu"}</td><td>${fmt(r.tempo_s)}s</td><td>${r.toques}</td><td>${r.voltar}</td>
+    <td class="path">${esc(r.telas)}</td></tr>`)).join("");
+  out.innerHTML = `
+    <div class="cards">${cards}</div>
+    <h2>${data.length} participante${data.length > 1 ? "s" : ""} • cada tarefa</h2>
+    <table><tr><th>Participante</th><th>Tarefa</th><th>Resultado</th><th>Tempo</th><th>Toques</th><th>Voltou</th><th>Caminho de telas</th></tr>${table}</table>
+    <div class="actions">
+      <a class="btn primary" href="app/index.html?teste">Novo teste</a>
+      <button class="ghost" id="dl">Baixar CSV</button>
+      <button class="ghost" id="cp">Copiar CSV</button>
+      <button class="danger" id="clr">Apagar todos os resultados</button>
+    </div>`;
+  document.getElementById("dl").onclick = () => {
+    const url = URL.createObjectURL(new Blob([csv()], { type: "text/csv" }));
+    Object.assign(document.createElement("a"), { href: url, download: "teste-move-ijui.csv" }).click();
+  };
+  document.getElementById("cp").onclick = async () => { await navigator.clipboard.writeText(csv()); document.getElementById("cp").textContent = "Copiado!"; };
+  document.getElementById("clr").onclick = () => {
+    if (confirm("Apagar os resultados de todas as sessões deste navegador? Isso não pode ser desfeito.")) { localStorage.removeItem(KEY); location.reload(); }
+  };
+}
+</script>
+</body>
+</html>

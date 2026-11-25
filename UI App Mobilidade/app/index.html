@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Move Ijuí</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F8F9FF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400..700,0..1,0&display=block">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="tema-escuro.css">
+</head>
+<body>
+<div id="app">
+<!--
+  Fluxos
+  Ônibus:  01 Início → 02 Rotas → 03 Linha → 05 Ao vivo → 08 Viagem concluída
+  Carro:   02 Rotas → 09 Pedir carro → 10 Categoria → 11 Buscando → 12 Seu motorista (a caminho → chegou) → 06 Corrida → 07 Avaliar
+  Abas:    01 Início · 04 Pontos · 14 Alertas · 15 Perfil (→ 16 Modo motorista)
+-->
+
+<!-- ======================================================= 01 · INÍCIO -->
+<section class="screen" id="s01" data-header="home" data-tabs="bus" data-tab="s01">
+  <main class="content">
+    <h1 class="h-title row gap-8" style="font-size:26px;line-height:32px">Bom dia, Mariana <img src="assets/emoji-aceno.png" alt="" width="26" height="26"></h1>
+    <p class="t-apoio muted" style="margin:4px 0 0">Saindo da Praça da República</p>
+
+    <!-- Busca com "quando" embutido (padrão Uber: "Para onde?" + "Agora") -->
+    <div class="search mt-24">
+      <button class="grow row gap-12" data-go="s02" style="height:100%;text-align:left;color:inherit"><span class="ms">search</span>Para onde você vai?</button>
+      <button class="when-pill" data-go="s09" data-when="Agendar"><span class="ms">schedule</span>Agora<span class="ms">expand_more</span></button>
+    </div>
+
+    <!-- Serviços em ícones (padrão 99 / Rota 77) -->
+    <div class="services mt-20">
+      <button data-go="s02"><span class="sv"><span class="ms">directions_bus</span></span>Ônibus</button>
+      <button data-go="s09" data-when="Agora"><span class="sv"><span class="ms">directions_car</span></span>Carro</button>
+      <button data-go="s09" data-when="Agendar"><span class="sv"><span class="ms">event</span></span>Agendar</button>
+      <button data-go="s04"><span class="sv"><span class="ms">location_on</span></span>Pontos</button>
+    </div>
+
+    <!-- Destinos recentes em lista (padrão Uber) -->
+    <div class="card list mt-20">
+      <button class="item" data-go="s02" data-dest="Campus UNIJUÍ|Campus UNIJUÍ • Portão 01"><span class="icon-sq round"><span class="ms">school</span></span><div class="grow"><div class="sb">Campus UNIJUÍ</div><div class="small muted">Portão 01 • 22 min de ônibus</div></div><span class="ms chev">chevron_right</span></button>
+      <button class="item" data-go="s02" data-dest="Casa|Casa • Rua 19 de Outubro, 420"><span class="icon-sq round"><span class="ms">home</span></span><div class="grow"><div class="sb">Casa</div><div class="small muted">Rua 19 de Outubro, 420 • 12 min a pé</div></div><span class="ms chev">chevron_right</span></button>
+      <button class="item" data-go="s02" data-dest="HCI|HCI • Hospital de Caridade"><span class="icon-sq round"><span class="ms">history</span></span><div class="grow"><div class="sb">HCI</div><div class="small muted">Hospital de Caridade • 11 min</div></div><span class="ms chev">chevron_right</span></button>
+    </div>
+
+    <!-- Pila Verde: saldo e desafio sempre à vista -->
+    <button class="card pila-mini mt-20" data-go="s20">
+      <span class="pila-coin">P</span>
+      <div class="grow"><div class="sb"><span data-pila>38</span> Pila Verde</div><div class="small muted">Desafio: 3 de 5 viagens de ônibus</div></div>
+      <span class="ms chev muted">chevron_right</span>
+    </button>
+
+    <div class="sec"><h2>Perto de você</h2><button data-go="s04">Ver pontos</button></div>
+    <button class="card opt" data-go="s04">
+      <span class="icon-sq lg brand" style="font-size:17px;font-weight:700">03</span>
+      <div class="main"><div class="t">Campus UNIJUÍ</div><div class="s">Praça da República • 85 m</div></div>
+      <div class="end"><div class="big green">4<small>min</small></div></div>
+    </button>
+
+    <button class="card row mt-16" data-go="s14" style="width:100%;text-align:left;box-shadow:none;background:var(--neutral-soft);border-color:transparent">
+      <span class="ms green">campaign</span>
+      <div class="grow small">Linha 03 com reforço até o campus: ônibus a cada 10 min.</div>
+      <span class="ms chev muted">chevron_right</span>
+    </button>
+  </main>
+</section>
+
+<!-- ======================================================= 02 · ROTAS -->
+<section class="screen" id="s02" data-header="back" data-title="Rotas" data-back="s01">
+  <main class="content">
+    <p class="lead">Escolha como você quer ir.</p>
+    <div class="card" style="padding:16px 20px;position:relative">
+      <div class="route">
+        <div class="stop"><div class="tiny muted">De</div><div class="t-apoio sb" data-swap="a">Praça da República</div></div>
+        <div class="stop dest"><div class="tiny muted">Para</div><div class="t-apoio sb" data-swap="b" data-s="dest">Campus UNIJUÍ</div></div>
+      </div>
+      <button class="icon-btn round" data-action="swap" aria-label="Inverter origem e destino" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;background:var(--neutral-soft)"><span class="ms">swap_vert</span></button>
+    </div>
+
+    <div class="scroller mt-20 seg" data-seg>
+      <button class="chip lg on">Recomendado</button>
+      <button class="chip lg">Mais rápido</button>
+      <button class="chip lg">Mais barato</button>
+    </div>
+
+    <div class="card mt-16" style="padding:0">
+      <button class="opt" data-go="s03" style="padding:20px">
+        <span class="icon-sq lg brand"><span class="ms">directions_bus</span></span>
+        <div class="main"><div class="t">Ônibus • Linha 03</div><div class="s">Chega 08:10 • 120 m a pé</div><span class="chip green mt-8">Recomendado</span></div>
+        <div class="end"><div class="big">22<small>min</small></div><div class="s">R$ 4,50</div></div>
+      </button>
+      <div style="height:1px;background:#EEF1F5;margin:0 20px"></div>
+      <button class="opt" data-go="s10" style="padding:20px">
+        <span class="icon-sq lg"><span class="ms">directions_car</span></span>
+        <div class="main"><div class="t">Carro por app</div><div class="s">Chega 07:57 • porta a porta</div></div>
+        <div class="end"><div class="big">9<small>min</small></div><div class="s">R$ 14,50</div></div>
+      </button>
+      <div style="height:1px;background:#EEF1F5;margin:0 20px"></div>
+      <button class="opt" data-action="toast" data-msg="Bicicletas: em breve no Move Ijuí" style="padding:20px">
+        <span class="icon-sq lg"><span class="ms">pedal_bike</span></span>
+        <div class="main"><div class="t">Bicicleta</div><div class="s">Chega 08:07 • ciclofaixa</div></div>
+        <div class="end"><div class="big">22<small>min</small></div><div class="s">R$ 2,00</div></div>
+      </button>
+    </div>
+
+    <p class="small muted mt-16 row gap-6"><span class="ms" style="font-size:16px">traffic</span>Trânsito livre na Av. 21 de Abril</p>
+  </main>
+</section>
+
+<!-- ======================================================= 03 · LINHA -->
+<section class="screen" id="s03" data-header="back" data-title="Linha 03" data-back="s02">
+  <main class="content">
+    <p class="lead">Confira o caminho antes de sair.</p>
+    <div class="row between"><span class="chip green pill-dot">Ao vivo</span><button class="icon-btn round" data-action="save" aria-label="Salvar trajeto" style="width:40px;height:40px;background:var(--neutral-soft)"><span class="ms">bookmark_add</span></button></div>
+    <h1 class="h-title mt-8">Centro → <span data-s="dest">Campus UNIJUÍ</span></h1>
+    <p class="small muted" style="margin:4px 0 0">Ar-condicionado • acessível • veículo 1042</p>
+
+    <div class="stats mt-20">
+      <div><div class="v">22 min</div><div class="l">Duração</div></div>
+      <div><div class="v">R$ 4,50</div><div class="l">Tarifa</div></div>
+      <div><div class="v">08:10</div><div class="l">Chegada</div></div>
+    </div>
+
+    <div class="sec"><h2>Itinerário</h2><span class="small muted">Saída 07:48</span></div>
+    <div class="card">
+      <div class="steps">
+        <div class="st"><span class="dot"><span class="ms">directions_walk</span></span><div class="grow"><div class="row between"><b class="sb">Caminhe até a parada</b><span class="small muted">2 min</span></div><div class="small muted">120 m até a Praça da República</div></div></div>
+        <div class="st"><span class="dot on"><span class="ms">directions_bus</span></span><div class="grow"><div class="row between"><b class="sb">Embarque na Linha 03</b><span class="small b green">07:52</span></div><div class="small muted">Ponto Central #12 • chega em 4 min</div></div></div>
+        <div class="st"><span class="dot"><span class="ms">more_vert</span></span><div class="grow"><div class="row between"><b class="sb">8 paradas</b><span class="small muted">12 min</span></div>
+          <button class="small b green mt-4 row gap-4" data-action="accordion"><span class="grow">Ver paradas</span><span class="ms chev" style="font-size:18px;transition:transform .3s">expand_more</span></button>
+          <ol class="stops small muted" style="margin:0;padding:0 0 0 18px;max-height:0;overflow:hidden;transition:max-height .4s var(--ease)">
+            <li class="mt-8">Rua do Comércio</li><li>Hospital Unimed</li><li>Escola Estadual</li><li>Av. Coronel Dico</li><li>Hospital Bom Pastor</li><li>Bairro São Geraldo</li><li>Av. David José Martins</li><li>Entrada do Campus</li>
+          </ol></div></div>
+        <div class="st"><span class="dot"><span class="ms">flag</span></span><div class="grow"><div class="row between"><b class="sb">Desça no Campus</b><span class="small muted">08:10</span></div><div class="small muted">Portão 1 • 60 m até o Bloco A</div></div></div>
+      </div>
+    </div>
+  </main>
+  <div class="cta-bar"><button class="btn primary" data-go="s05">Acompanhar ao vivo <span class="ms">arrow_forward</span></button></div>
+</section>
+
+<!-- ======================================================= 04 · PONTOS -->
+<section class="screen" id="s04" data-header="home" data-tabs="bus" data-tab="s04">
+  <main class="content flush" style="padding-top:0">
+    <div class="map" data-map="pontos" style="height:340px">
+      <button class="map-btn" data-recenter aria-label="Centralizar" style="right:16px;top:232px;background:var(--brand);color:#fff;width:40px;height:40px"><span class="ms">my_location</span></button>
+    </div>
+    <div class="sheet" style="padding-bottom:16px">
+      <div class="grabber"></div>
+      <div class="row between top">
+        <div><div class="small muted">Ponto #104 • 85 m de você</div><h1 class="h-title mt-4">Praça da República</h1></div>
+        <button class="icon-btn round" data-action="fav" aria-label="Favoritar" style="background:var(--brand-soft);color:var(--brand)"><span class="ms">star</span></button>
+      </div>
+      <div class="scroller mt-16">
+        <span class="chip lg"><span class="ms">roofing</span>Abrigo</span>
+        <span class="chip lg"><span class="ms">desktop_windows</span>Painel digital</span>
+        <span class="chip lg"><span class="ms">accessible</span>Acessível</span>
+      </div>
+      <div class="sec"><h2>Próximos ônibus</h2><span class="small muted">ao vivo</span></div>
+      <div class="card list">
+        <button class="item opt" data-go="s03"><span class="icon-sq lg brand" style="font-size:17px;font-weight:700">03</span><div class="main"><div class="t">Campus UNIJUÍ</div><div class="s">Lotação baixa</div></div><div class="end"><div class="big green">4<small>min</small></div></div></button>
+        <button class="item opt" data-go="s03"><span class="icon-sq lg" style="font-size:17px;font-weight:700">01</span><div class="main"><div class="t">Glória / HCI</div><div class="s">No horário</div></div><div class="end"><div class="big">11<small>min</small></div></div></button>
+        <button class="item opt" data-go="s03"><span class="icon-sq lg" style="font-size:17px;font-weight:700">05</span><div class="main"><div class="t">Thomé de Souza</div><div class="s warn">Atraso leve</div></div><div class="end"><div class="big">19<small>min</small></div></div></button>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- ======================================================= 05 · AO VIVO -->
+<section class="screen" id="s05" data-header="back" data-title="Ao vivo" data-back="s03">
+  <main class="content">
+    <div class="card" style="background:var(--brand);color:#fff;border:0">
+      <div class="row between">
+        <div><div class="small" style="color:#ffffffb3">Linha 03 • chegada prevista</div><div style="font-size:34px;line-height:40px;font-weight:800">08:10</div></div>
+        <div class="right"><div class="num" style="font-size:24px"><span data-countdown>11</span> min</div><div class="small" style="color:#ffffffb3">restantes</div></div>
+      </div>
+      <div class="progress mt-16" style="background:#ffffff33"><i data-live-bar style="width:50%;background:#A5F4C0"></i></div>
+      <div class="small mt-8" style="color:#ffffffb3" data-live-stop>Parada 4 de 8</div>
+    </div>
+
+    <div class="map mt-16" data-map="aovivo" style="height:260px;border-radius:16px">
+      <button class="map-btn" data-recenter aria-label="Centralizar" style="right:12px;top:12px"><span class="ms">my_location</span></button>
+    </div>
+
+    <div class="card list mt-16">
+      <div class="item"><span class="icon-sq"><span class="ms">location_on</span></span><div class="grow"><div class="small muted" data-live-next-d>Próxima parada • 300 m</div><div class="sb" data-live-next>Hospital Unimed</div></div></div>
+      <div class="item"><span class="icon-sq"><span class="ms">vibration</span></span><div class="grow"><div class="sb">Avisar antes de descer</div><div class="small muted">Vibra 1 parada antes</div></div><button class="toggle on" data-action="toggle" aria-label="Avisar antes de descer"></button></div>
+      <div class="item"><span class="icon-sq"><span class="ms">groups</span></span><div class="grow"><div class="sb">Lotação moderada</div><div class="small muted">65% • ar-condicionado ligado</div></div></div>
+    </div>
+  </main>
+  <div class="cta-bar">
+    <button class="btn primary" data-go="s08">Cheguei ao destino</button>
+    <button class="link-btn" data-action="toast" data-msg="Problema enviado à Central de Trânsito">Reportar um problema</button>
+  </div>
+</section>
+
+<!-- ======================================================= 06 · CORRIDA EM ANDAMENTO -->
+<section class="screen" id="s06" data-header="back" data-title="Corrida em andamento" data-back="s12">
+  <main class="content flush" style="padding-top:0">
+    <div class="map" data-map="corrida" style="height:400px">
+      <button class="map-btn" data-recenter aria-label="Centralizar" style="right:16px;top:100px"><span class="ms">my_location</span></button>
+      <span class="tag-map" style="left:16px;bottom:40px"><span class="ms green">verified_user</span>Viagem monitorada</span>
+    </div>
+    <div class="sheet" style="padding-bottom:16px">
+      <div class="grabber"></div>
+      <div class="row between" style="align-items:flex-end">
+        <div><div class="num" style="font-size:30px;line-height:36px"><span data-ride-min>6</span> min</div><div class="small muted">Chegada 07:57 • <span data-ride-km>2,8 km</span></div></div>
+        <span class="chip green lg">42 km/h</span>
+      </div>
+      <div class="progress mt-16" style="height:8px"><i data-ride-bar style="width:0%"></i></div>
+      <div class="card row mt-20" style="box-shadow:none;background:var(--neutral-soft);border-color:transparent;padding:14px 16px"><span class="ms green">turn_right</span><div class="small sb">Siga pela Av. 21 de Abril até <span data-s="dest">Campus UNIJUÍ</span></div></div>
+
+      <div class="card mt-16">
+        <div class="row gap-16">
+          <img class="avatar" src="assets/motorista-encontrado.jpg" alt="" style="width:56px;height:56px;border:0">
+          <div class="grow"><div class="h-sec" style="font-weight:600">Carlos Eduardo M.</div><div class="small muted">Onix Prata • ★ 4.96</div><span class="plate mt-8">IJU-4B29</span></div>
+        </div>
+        <div class="row mt-16" style="gap:10px">
+          <button class="msg-field" data-action="toast" data-msg="Abrindo conversa com Carlos"><span class="ms">chat</span>Mensagem para Carlos</button>
+          <button class="icon-btn round" data-action="toast" data-msg="Ligando pelo app…" aria-label="Ligar"><span class="ms">call</span></button>
+        </div>
+      </div>
+      <div class="safety mt-16">
+        <button data-action="toast" data-msg="Link do trajeto copiado"><span class="ms">share_location</span>Compartilhar</button>
+        <button data-action="toast" data-msg="Central de Segurança: em breve"><span class="ms">shield</span>Segurança</button>
+        <button class="sos" data-action="toast" data-msg="Ligando para 190…"><span class="ms">sos</span>Emergência</button>
+      </div>
+    </div>
+  </main>
+  <div class="cta-bar"><button class="btn primary" data-go="s07">Finalizar corrida</button></div>
+</section>
+
+<!-- ======================================================= 07 · AVALIAR CORRIDA -->
+<section class="screen" id="s07" data-header="back" data-title="Avaliar corrida" data-back="s06">
+  <main class="content">
+    <div class="hero-c mt-8">
+      <div class="big-icon"><span class="ms fill">check_circle</span></div>
+      <h1>Você chegou</h1>
+      <p><span data-s="dest-full">Campus UNIJUÍ • Portão 01</span> • 07:57</p>
+    </div>
+
+    <div class="card list mt-24">
+      <div class="item"><span class="grow muted"><span data-s="cat">Move Pop</span></span><span data-s="base">R$ 16,50</span></div>
+      <div class="item"><span class="grow green">Desconto acadêmico</span><span class="green">− R$ 2,00</span></div>
+      <div class="item"><span class="grow b">Total pago</span><span class="h-sec" data-s="price">R$ 14,50</span></div>
+    </div>
+    <p class="small muted mt-12 row gap-6"><span class="ms" style="font-size:16px">credit_card</span>Cartão Move Estudante • saldo R$ 24,00</p>
+
+    <div class="card mt-24" style="text-align:center">
+      <img class="avatar" src="assets/motorista-encontrado.jpg" alt="" style="width:56px;height:56px;border:0;margin:0 auto">
+      <h2 class="h-sec mt-12" style="font-weight:600">Como foi com o Carlos?</h2>
+      <div class="stars mt-16" data-stars="5" data-labels="Muito ruim|Ruim|Regular|Boa|Excelente"></div>
+      <div class="small b green mt-8" data-stars-label>Excelente (5/5)</div>
+      <div class="choices mt-20" style="justify-content:center">
+        <button class="on"><span class="ms">check</span>Direção segura</button><button>Pontual</button><button>Carro limpo</button><button>Simpático</button>
+      </div>
+    </div>
+
+    <!-- Gorjeta opcional (Uber / 99) -->
+    <div class="card mt-20">
+      <div class="sb">Quer deixar uma gorjeta?</div>
+      <div class="small muted mt-4">100% vai para o Carlos</div>
+      <div class="seg mt-16" data-seg>
+        <button class="chip lg on" style="flex:1;justify-content:center">Não</button>
+        <button class="chip lg" style="flex:1;justify-content:center">R$ 2</button>
+        <button class="chip lg" style="flex:1;justify-content:center">R$ 5</button>
+        <button class="chip lg" style="flex:1;justify-content:center">R$ 10</button>
+      </div>
+    </div>
+  </main>
+  <div class="cta-bar"><button class="btn primary" data-go="s01" data-reset data-msg="Avaliação enviada. Obrigado!">Enviar avaliação</button></div>
+</section>
+
+<!-- ======================================================= 08 · VIAGEM CONCLUÍDA -->
+<section class="screen" id="s08" data-header="back" data-title="Viagem concluída" data-back="s05">
+  <main class="content">
+    <div class="hero-c mt-8">
+      <div class="big-icon"><span class="ms fill">check_circle</span></div>
+      <h1>Você chegou!</h1>
+      <p data-s="dest-full">Campus UNIJUÍ • Portão 01</p>
+    </div>
+
+    <div class="stats mt-24">
+      <div><div class="v">22 min</div><div class="l">Tempo</div></div>
+      <div><div class="v">R$ 4,50</div><div class="l">Tarifa</div></div>
+      <div><div class="v green">420 g</div><div class="l">CO₂ evitado</div></div>
+    </div>
+    <p class="small muted mt-12" style="text-align:center">Você economizou R$ 10,00 indo de ônibus</p>
+
+    <!-- Recompensa da viagem sustentável -->
+    <button class="card pila-mini earned mt-20" data-go="s20">
+      <span class="pila-coin">P</span>
+      <div class="grow"><div class="sb">+3 Pila Verde</div><div class="small muted">Desafio da semana: 4 de 5 viagens</div></div>
+      <span class="small b green">Ver</span>
+    </button>
+
+    <div class="card mt-24">
+      <div class="small b green">Pesquisa de mobilidade</div>
+      <h2 class="h-sec mt-4" style="font-weight:600">Como foi seu trajeto hoje?</h2>
+      <div class="stars dark mt-16" data-stars="4" data-labels="Muito ruim|Ruim|Regular|Muito boa|Excelente"></div>
+      <div class="small sb mt-8" style="text-align:center" data-stars-label>Muito boa (4 de 5 estrelas)</div>
+      <div class="small muted mt-20">O que marcou seu trajeto?</div>
+      <div class="choices mt-8">
+        <button class="on"><span class="ms">check</span>Ônibus pontual</button><button class="on"><span class="ms">check</span>Lotação ok</button><button>Calçada boa</button><button>Sem abrigo</button><button>Preço justo</button>
+      </div>
+      <textarea class="input mt-16" placeholder="Quer contar mais? (opcional)"></textarea>
+    </div>
+  </main>
+  <div class="cta-bar"><button class="btn primary" data-go="s01" data-reset data-msg="Resposta enviada. Obrigado!">Enviar resposta</button></div>
+</section>
+
+<!-- ======================================================= 09 · PEDIR CARRO -->
+<section class="screen" id="s09" data-header="back" data-title="Pedir carro" data-back="s02">
+  <main class="content flush" style="padding-top:0">
+    <div class="map" data-map="pedir" style="height:340px">
+      <button class="map-btn" data-recenter aria-label="Centralizar" style="right:16px;top:100px"><span class="ms">my_location</span></button>
+      <span class="tag-map" style="left:16px;bottom:40px"><span class="ms green">directions_car</span>8 motoristas por perto</span>
+    </div>
+    <div class="sheet" style="padding-bottom:16px">
+      <div class="grabber"></div>
+      <p class="lead">Confirme o destino e quando quer sair.</p>
+      <div class="card" style="padding:16px 20px">
+        <div class="route">
+          <div class="stop"><div class="tiny muted">Embarque</div><div class="t-apoio sb">Praça da República</div></div>
+          <div class="stop dest"><div class="tiny muted">Destino</div><div class="t-apoio sb" data-s="dest-full">Campus UNIJUÍ • Portão 01</div></div>
+        </div>
+      </div>
+      <div class="scroller mt-16 seg" data-seg>
+        <button class="chip lg on" data-dest="Campus UNIJUÍ|Campus UNIJUÍ • Portão 01"><span class="ms">school</span>UNIJUÍ</button>
+        <button class="chip lg" data-dest="Casa|Casa • Rua 19 de Outubro, 420"><span class="ms">home</span>Casa</button>
+        <button class="chip lg" data-dest="HCI|HCI • Hospital de Caridade"><span class="ms">local_hospital</span>HCI</button>
+      </div>
+      <div class="sec"><h2>Quando?</h2></div>
+      <div class="seg" data-seg>
+        <button class="chip lg on" data-when="Agora" style="flex:1;justify-content:center;height:44px"><span class="ms">bolt</span>Agora</button>
+        <button class="chip lg" data-when="Agendar" style="flex:1;justify-content:center;height:44px"><span class="ms">schedule</span>Agendar</button>
+      </div>
+      <div data-show-when="Agendar" style="display:none">
+        <div class="small muted mt-16">Hoje, às</div>
+        <div class="scroller mt-8 seg" data-seg>
+          <button class="chip lg" data-time="08:30">08:30</button>
+          <button class="chip lg on" data-time="09:00">09:00</button>
+          <button class="chip lg" data-time="12:00">12:00</button>
+          <button class="chip lg" data-time="18:00">18:00</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div class="cta-bar"><button class="btn primary" data-go="s10">Escolher categoria <span class="ms">arrow_forward</span></button></div>
+</section>
+
+<!-- ======================================================= 10 · CATEGORIA -->
+<section class="screen" id="s10" data-header="back" data-title="Escolha a categoria" data-back="s09">
+  <main class="content flush" style="padding-top:0">
+    <!-- Mapa com a rota no topo e categorias na folha (padrão Uber / 99 / Rota 77) -->
+    <div class="map" data-map="categoria" style="height:280px">
+      <span class="tag-map" style="right:16px;bottom:40px;z-index:3"><span class="ms green">schedule</span>Chegada ~07:57</span>
+    </div>
+    <div class="sheet" style="padding-bottom:16px">
+      <div class="grabber"></div>
+      <p class="lead" style="margin-bottom:4px">Escolha o tipo de carro</p>
+      <p class="small muted" style="margin:0 0 16px">Praça da República → <span data-s="dest">Campus UNIJUÍ</span> • <span data-s="when">Agora</span></p>
+      <div class="stack gap-8" data-pick>
+        <button class="card opt on-pick" data-price="14.50" data-name="Move Pop">
+          <img class="car" src="assets/carro-pop.jpg" alt="">
+          <div class="main"><div class="t row gap-6">Move Pop <span class="seats"><span class="ms">person</span>4</span></div><div class="s">07:57 • a 3 min de você</div><span class="chip green mt-4">Melhor preço</span></div>
+          <div class="end"><div class="big">R$ 14,50</div></div>
+        </button>
+        <button class="card opt" data-price="18.90" data-name="Move Conforto">
+          <img class="car" src="assets/carro-conforto.jpg" alt="">
+          <div class="main"><div class="t row gap-6">Move Conforto <span class="seats"><span class="ms">person</span>4</span></div><div class="s">07:59 • carro novo com ar</div></div>
+          <div class="end"><div class="big">R$ 18,90</div></div>
+        </button>
+        <button class="card opt" data-price="24.00" data-name="Move Família">
+          <img class="car" src="assets/carro-familia.jpg" alt="">
+          <div class="main"><div class="t row gap-6">Move Família <span class="seats"><span class="ms">person</span>6</span></div><div class="s">Bagagem • poucos carros</div></div>
+          <div class="end"><div class="big">R$ 24,00</div></div>
+        </button>
+      </div>
+      <p class="small muted mt-16 row gap-6"><span class="ms green" style="font-size:16px">verified_user</span>Motoristas cooperados e credenciados em Ijuí</p>
+    </div>
+  </main>
+  <div class="cta-bar">
+    <!-- Pagamento e cupom logo acima do botão, como nos apps de corrida -->
+    <div class="pay-row">
+      <button class="pay" data-action="toast" data-msg="Trocar pagamento: em breve"><span class="ms green">credit_card</span><span class="grow ellipsis">Cartão Move Estudante</span><span class="ms muted">expand_more</span></button>
+      <button class="pay coupon" data-action="toast" data-msg="Cupom VOLTAASAULAS aplicado: 10% até o campus"><span class="ms green">confirmation_number</span>Cupom</button>
+    </div>
+    <button class="btn primary" data-action="confirm-car"><span data-pick-label>Confirmar Move Pop • R$ 14,50</span></button>
+  </div>
+</section>
+
+<!-- ======================================================= 11 · BUSCANDO -->
+<section class="screen" id="s11" data-header="back" data-title="Buscando motorista" data-back="s10" data-auto="s12" data-auto-ms="4500">
+  <main class="content flush" style="padding-top:0">
+    <div class="map" data-map="busca" style="height:420px"></div>
+    <div class="sheet" style="padding-bottom:16px">
+      <div class="grabber"></div>
+      <div class="hero-c" style="padding-top:0">
+        <h1 style="font-size:22px">Procurando motorista…</h1>
+        <p>Geralmente leva menos de 1 minuto • <span data-timer>00:00</span></p>
+      </div>
+      <div class="progress mt-20"><i class="searching" style="width:15%"></i></div>
+      <div class="card list mt-20">
+        <div class="item"><span class="icon-sq"><span class="ms">directions_car</span></span><div class="grow"><div class="sb" data-s="cat">Move Pop</div><div class="small muted">Tarifa fixa</div></div><b data-s="price">R$ 14,50</b></div>
+        <div class="item"><span class="icon-sq"><span class="ms">route</span></span><div class="grow"><div class="sb">Praça da República → <span data-s="dest">Campus UNIJUÍ</span></div><div class="small muted" data-s="dest-full">Campus UNIJUÍ • Portão 01</div></div></div>
+      </div>
+    </div>
+  </main>
+  <div class="cta-bar"><button class="btn" style="background:var(--err-bg);color:var(--err)" data-go="s10">Cancelar busca</button></div>
+</section>
+
+<!-- ======================================================= 12 · SEU MOTORISTA (a caminho → chegou)
+     Uma tela só: quando o tempo zera, ela muda sozinha para "chegou" (classe .arrived, ver mapa.js). -->
+<section class="screen" id="s12" data-header="back" data-title="Motorista a caminho" data-title-arrived="Motorista chegou" data-back="s11">
+  <main class="content flush" style="padding-top:0">
+    <div class="map" data-map="acaminho" style="height:300px">
+      <div class="fade"></div>
+      <span class="tag-map dark only-coming" style="left:50%;bottom:44px;transform:translateX(-50%)"><span class="ms">directions_car</span>Onix Prata • <span data-eta-m>2,0 km</span></span>
+      <span class="tag-map dark only-arrived" style="left:50%;bottom:44px;transform:translateX(-50%)"><span class="ms">directions_car</span>A 45 m de você</span>
+    </div>
+    <div class="sheet" style="padding-bottom:16px">
+      <div class="grabber"></div>
+
+      <!-- A caminho: tempo grande + código pequeno ao lado -->
+      <div class="row between only-coming" style="align-items:flex-end">
+        <div><div class="num" style="font-size:30px;line-height:36px"><span data-eta>3</span> min</div><div class="small muted">Até a Praça da República</div></div>
+        <div class="right"><div class="tiny muted">Código</div><div class="pin-code" style="font-size:26px;line-height:32px">7421</div></div>
+      </div>
+      <div class="progress mt-16 only-coming"><i data-eta-bar style="width:0%"></i></div>
+
+      <!-- Chegou: o código vira o destaque -->
+      <div class="only-arrived">
+        <div class="hero-c" style="padding-top:0">
+          <h1 style="font-size:22px">Seu motorista chegou</h1>
+          <p>Confira a placa e diga o código ao motorista</p>
+        </div>
+        <div class="card mt-20" style="text-align:center;background:var(--brand-soft);border-color:transparent;box-shadow:none">
+          <div class="small muted">Código de embarque</div>
+          <div class="pin-code mt-4" style="font-size:44px;line-height:52px">7421</div>
+        </div>
+      </div>
+
+      <!-- Placa e carro em destaque, motorista ao lado (padrão Uber / 99) -->
+      <div class="card mt-20">
+        <div class="row between top">
+          <div class="driver-pic">
+            <img class="avatar" src="assets/motorista-encontrado.jpg" alt="">
+            <span class="rate"><span class="ms fill">star</span>4.96</span>
+          </div>
+          <div class="right">
+            <span class="plate lg">IJU-4B29</span>
+            <div class="small muted mt-4">Onix • Prata</div>
+          </div>
+        </div>
+        <div class="sb mt-12">Carlos Eduardo M. <span class="small muted" style="font-weight:500">• 1.420 corridas</span></div>
+        <div class="row mt-16" style="gap:10px">
+          <button class="msg-field" data-action="toast" data-msg="Abrindo conversa com Carlos"><span class="ms">chat</span>Mensagem para Carlos</button>
+          <button class="icon-btn round" data-action="toast" data-msg="Ligando pelo app…" aria-label="Ligar"><span class="ms">call</span></button>
+        </div>
+      </div>
+
+      <!-- Atalhos de segurança (Uber: "Segurança"; 99: "Botão de emergência") -->
+      <div class="safety mt-16">
+        <button data-action="toast" data-msg="Link do trajeto copiado"><span class="ms">share_location</span>Compartilhar</button>
+        <button data-action="toast" data-msg="Central de Segurança: em breve"><span class="ms">shield</span>Segurança</button>
+        <button class="sos" data-action="toast" data-msg="Ligando para 190…"><span class="ms">sos</span>Emergência</button>
+      </div>
+
+      <div class="only-coming">
+        <div class="small muted mt-20">Mensagem rápida</div>
+        <div class="scroller mt-8">
+          <button class="chip lg" data-action="toast" data-msg="Mensagem enviada">Estou em frente ao banco</button>
+          <button class="chip lg" data-action="toast" data-msg="Mensagem enviada">Já estou descendo</button>
+          <button class="chip lg" data-action="toast" data-msg="Mensagem enviada">Perto da farmácia</button>
+        </div>
+      </div>
+      <p class="small muted mt-16 row gap-6 only-arrived"><span class="ms" style="font-size:16px">flag</span>Rua 19 de Outubro, 340 • em frente ao banco</p>
+    </div>
+  </main>
+  <div class="cta-bar">
+    <button class="btn primary only-arrived" data-go="s06">Já embarquei</button>
+    <button class="link-btn only-coming" style="color:var(--err)" data-action="cancel-ride">Cancelar corrida</button>
+  </div>
+</section>
+
+<!-- ======================================================= 14 · ALERTAS -->
+<section class="screen" id="s14" data-header="home" data-tabs="bus" data-tab="s14">
+  <main class="content">
+    <h1 class="h-title">Alertas</h1>
+    <div class="scroller mt-16 seg" data-seg>
+      <button class="chip lg on">Todos</button>
+      <button class="chip lg">Meus trajetos</button>
+      <button class="chip lg">Obras</button>
+    </div>
+
+    <div class="card mt-20" style="border-left:4px solid var(--err)">
+      <div class="row between"><span class="chip err pill-dot">Agora</span><span class="small muted">há 4 min</span></div>
+      <h2 class="h-sec mt-12" style="font-size:19px;line-height:26px">Linha 03 atrasada ~12 min</h2>
+      <p class="small muted" style="margin:6px 0 0">Obra na Av. 21 de Abril, perto da Praça dos Imigrantes.</p>
+      <div class="row between mt-16 soft" style="padding:12px 14px;background:var(--neutral-soft)">
+        <div><div class="tiny muted">Era</div><div class="b muted" style="text-decoration:line-through">08:10</div></div>
+        <span class="ms muted">arrow_forward</span>
+        <div class="right"><div class="tiny muted">Agora</div><div class="b red">08:22</div></div>
+      </div>
+      <button class="btn sm tonal mt-16" data-go="s02">Ver alternativa: Linha 05 às 08:12</button>
+    </div>
+
+    <div class="sec"><h2>Anteriores</h2></div>
+    <div class="card list">
+      <div class="item"><span class="icon-sq"><span class="ms">construction</span></span><div class="grow"><div class="sb">Obra na Rua do Comércio</div><div class="small muted">Linhas 01 e 05 com desvio • ontem</div></div></div>
+      <div class="item"><span class="icon-sq"><span class="ms">check_circle</span></span><div class="grow"><div class="sb">Linha 01 normalizada</div><div class="small muted">Horários voltaram ao normal • seg</div></div></div>
+    </div>
+  </main>
+</section>
+
+<!-- ======================================================= 15 · PERFIL -->
+<section class="screen" id="s15" data-header="home" data-tabs="bus" data-tab="s15">
+  <main class="content">
+    <div class="row gap-16">
+      <img src="assets/perfil-mariana.jpg" alt="" style="width:68px;height:68px;border-radius:50%;object-fit:cover;object-position:top">
+      <div class="grow"><h1 class="h-sec row gap-4" style="font-size:20px">Mariana Siqueira <span class="ms fill green" style="font-size:18px">verified</span></h1><div class="small muted">Estudante UNIJUÍ • Ijuí, RS</div></div>
+    </div>
+
+    <div class="stats mt-20">
+      <div><div class="v">24</div><div class="l">Viagens no mês</div></div>
+      <button data-go="s20"><div class="v green"><span data-pila>38</span></div><div class="l">Pila Verde</div></button>
+      <div><div class="v green">+18%</div><div class="l">Sustentáveis</div></div>
+    </div>
+
+    <div class="sec"><h2>Locais salvos</h2><button data-action="toast" data-msg="Adicionar local: em breve">Adicionar</button></div>
+    <div class="card list">
+      <button class="item" data-go="s02"><span class="icon-sq"><span class="ms">school</span></span><div class="grow"><div class="sb">Campus UNIJUÍ</div><div class="small muted">Linhas 03 e 08</div></div><span class="ms chev">chevron_right</span></button>
+      <button class="item" data-go="s02"><span class="icon-sq"><span class="ms">home</span></span><div class="grow"><div class="sb">Casa</div><div class="small muted">Rua 19 de Outubro, 420</div></div><span class="ms chev">chevron_right</span></button>
+      <button class="item" data-go="s02"><span class="icon-sq"><span class="ms">local_hospital</span></span><div class="grow"><div class="sb">Hospital HCI</div><div class="small muted">Linha 01</div></div><span class="ms chev">chevron_right</span></button>
+    </div>
+
+    <div class="card mt-20" style="background:var(--brand);color:#fff;border:0">
+      <div class="small" style="color:#ffffffb3">Pesquisa Design Thinking • Ijuí 2025</div>
+      <div class="h-sec mt-4">Ajude a melhorar a mobilidade da cidade</div>
+      <button class="btn sm mt-16" style="background:#ffffff26;color:#fff;width:auto;padding:0 16px" data-go="s08">Participar <span class="ms">arrow_forward</span></button>
+    </div>
+
+    <div class="sec"><h2>Conta</h2></div>
+    <div class="card list">
+      <button class="item" data-go="s16"><span class="icon-sq"><span class="ms">local_taxi</span></span><div class="grow"><div class="sb">Modo motorista</div><div class="small muted">Dirija pela cooperativa</div></div><span class="ms chev">chevron_right</span></button>
+      <button class="item" data-action="theme"><span class="icon-sq"><span class="ms">dark_mode</span></span><div class="grow"><div class="sb">Aparência</div><div class="small muted" data-s="theme">Automático</div></div><span class="ms chev">chevron_right</span></button>
+      <button class="item" data-action="toast" data-msg="Pagamentos: em breve"><span class="icon-sq"><span class="ms">credit_card</span></span><div class="grow"><div class="sb">Pagamentos</div><div class="small muted">Cartão Move Estudante</div></div><span class="ms chev">chevron_right</span></button>
+      <button class="item" data-action="toast" data-msg="Ajuda: em breve"><span class="icon-sq"><span class="ms">help</span></span><div class="grow"><div class="sb">Ajuda</div></div><span class="ms chev">chevron_right</span></button>
+    </div>
+  </main>
+</section>
+
+<!-- ======================================================= 16 · MODO MOTORISTA -->
+<section class="screen" id="s16" data-header="back" data-title="Modo motorista" data-back="s15">
+  <main class="content">
+    <div class="card row">
+      <span style="width:12px;height:12px;border-radius:50%;background:var(--brand)" class="pulse" data-online-dot></span>
+      <div class="grow"><div class="sb" data-online-label>Online</div><div class="small muted">Cooperativa Municipal de Ijuí</div></div>
+      <button class="toggle on" data-action="online" aria-label="Ficar online"></button>
+    </div>
+    <div class="row between mt-16" style="padding:0 4px"><span class="muted">Ganhos de hoje</span><span><b class="h-sec">R$ 142,80</b> <span class="small muted">• 8 corridas</span></span></div>
+
+    <div data-request>
+      <div class="sec"><h2>Nova corrida</h2>
+        <div class="ring" style="--p:1"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" stroke="#E6EBF1"/><circle class="arc" cx="22" cy="22" r="19" stroke="var(--brand)"/></svg><b data-ring>12</b></div>
+      </div>
+      <div class="card">
+        <div class="row between" style="align-items:flex-end">
+          <div><div class="small muted">Você recebe</div><div class="num green" style="font-size:30px;line-height:36px">R$ 12,80</div></div>
+          <div class="right small muted">4,2 km<br>~9 min</div>
+        </div>
+        <div class="route mt-20">
+          <div class="stop"><div class="tiny muted">Embarque • 1,1 km de você</div><div class="sb">Praça da República, 340</div></div>
+          <div class="stop dest"><div class="tiny muted">Destino</div><div class="sb">Campus UNIJUÍ • Portão 01</div></div>
+        </div>
+        <div class="row mt-20 soft" style="padding:12px 14px;background:var(--neutral-soft)">
+          <img src="assets/avatar-mariana-silva.jpg" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;object-position:top">
+          <div class="grow"><div class="sb">Mariana Silva</div><div class="small muted">★ 4.98 • estudante</div></div>
+        </div>
+        <div class="row mt-20">
+          <button class="btn sm" style="background:var(--err-bg);color:var(--err)" data-action="decline">Recusar</button>
+          <button class="btn sm primary" data-action="accept">Aceitar</button>
+        </div>
+      </div>
+      <p class="small muted mt-12 row gap-6"><span class="ms" style="font-size:16px">warning</span>Interaja apenas com o veículo parado.</p>
+    </div>
+    <div class="card mt-24" data-waiting style="display:none;text-align:center;padding:28px 16px">
+      <span class="icon-sq lg round pulse" style="margin:0 auto"><span class="ms">radar</span></span>
+      <div class="h-sec mt-12" style="font-weight:600">Procurando corridas…</div>
+      <div class="small muted mt-4">Avisaremos quando alguém pedir por perto.</div>
+    </div>
+  </main>
+</section>
+
+<!-- ======================================================= 17 · SEM MOTORISTAS (exceção) -->
+<section class="screen" id="s17" data-header="back" data-title="Sem motoristas" data-back="s10">
+  <main class="content">
+    <div class="hero-c mt-24">
+      <div class="big-icon" style="background:#FFF1E6;color:var(--warn)"><span class="ms">directions_car</span></div>
+      <h1>Nenhum <span data-s="cat">Move Família</span> por perto</h1>
+      <p>Todos os carros dessa categoria estão ocupados agora. Veja outras opções para chegar a <span data-s="dest">Campus UNIJUÍ</span>.</p>
+    </div>
+    <div class="sec"><h2>Você pode</h2></div>
+    <div class="card list">
+      <button class="item opt" data-action="try-pop"><span class="icon-sq lg"><span class="ms">directions_car</span></span><div class="main"><div class="t">Pedir um Move Pop</div><div class="s">4 lugares • chega em 3 min</div></div><div class="end"><div class="big">R$ 14,50</div></div></button>
+      <button class="item opt" data-go="s03"><span class="icon-sq lg brand"><span class="ms">directions_bus</span></span><div class="main"><div class="t">Ir de ônibus</div><div class="s">Linha 03 passa em 4 min</div></div><div class="end"><div class="big">R$ 4,50</div></div></button>
+    </div>
+  </main>
+  <div class="cta-bar">
+    <button class="btn tonal" data-go="s11">Procurar de novo</button>
+  </div>
+</section>
+
+<!-- ======================================================= 18 · CORRIDA CANCELADA (exceção) -->
+<section class="screen" id="s18" data-header="back" data-title="Corrida cancelada" data-back="s10">
+  <main class="content">
+    <div class="hero-c mt-24">
+      <div class="big-icon" style="background:var(--err-bg);color:var(--err)"><span class="ms">close</span></div>
+      <h1 data-cancel="driver">O motorista cancelou</h1>
+      <h1 data-cancel="you">Você cancelou a corrida</h1>
+      <p data-cancel="driver">Isso acontece às vezes. Você não paga nada, e já podemos procurar outro motorista.</p>
+      <p data-cancel="you">Como o motorista ainda não tinha chegado, não houve cobrança.</p>
+    </div>
+    <div class="card list mt-24">
+      <div class="item"><span class="icon-sq"><span class="ms">directions_car</span></span><div class="grow"><div class="sb" data-s="cat">Move Pop</div><div class="small muted">Praça da República → <span data-s="dest">Campus UNIJUÍ</span></div></div></div>
+      <div class="item"><span class="icon-sq"><span class="ms">payments</span></span><div class="grow"><div class="sb">R$ 0,00</div><div class="small muted">Nenhuma cobrança</div></div></div>
+    </div>
+  </main>
+  <div class="cta-bar">
+    <button class="btn primary" data-cancel="driver" data-go="s11">Procurar outro motorista</button>
+    <button class="btn primary" data-cancel="you" data-go="s01" data-reset>Voltar ao início</button>
+    <button class="link-btn" data-cancel="driver" data-go="s01" data-reset>Voltar ao início</button>
+    <button class="link-btn" data-cancel="you" data-go="s10">Pedir de novo</button>
+  </div>
+</section>
+
+<!-- ======================================================= 19 · CORRIDA AGENDADA -->
+<section class="screen" id="s19" data-header="back" data-title="Corrida agendada" data-back="s10">
+  <main class="content">
+    <div class="hero-c mt-24">
+      <div class="big-icon"><span class="ms fill">event_available</span></div>
+      <h1>Agendada para <span data-s="time">09:00</span></h1>
+      <p>Vamos avisar 10 minutos antes, quando o motorista estiver a caminho.</p>
+    </div>
+    <div class="card list mt-24">
+      <div class="item"><span class="icon-sq"><span class="ms">schedule</span></span><div class="grow"><div class="small muted">Quando</div><div class="sb">Hoje, às <span data-s="time">09:00</span></div></div></div>
+      <div class="item"><span class="icon-sq"><span class="ms">route</span></span><div class="grow"><div class="small muted">Trajeto</div><div class="sb">Praça da República → <span data-s="dest">Campus UNIJUÍ</span></div></div></div>
+      <div class="item"><span class="icon-sq"><span class="ms">directions_car</span></span><div class="grow"><div class="small muted">Categoria</div><div class="sb" data-s="cat">Move Pop</div></div><b data-s="price">R$ 14,50</b></div>
+    </div>
+    <p class="small muted mt-12 row gap-6"><span class="ms" style="font-size:16px">info</span>Dá pra cancelar sem custo até 15 min antes.</p>
+  </main>
+  <div class="cta-bar">
+    <button class="btn primary" data-go="s01" data-reset data-msg="Agendamento salvo">Voltar ao início</button>
+    <button class="link-btn" style="color:var(--err)" data-go="s01" data-reset data-msg="Agendamento cancelado">Cancelar agendamento</button>
+  </div>
+</section>
+
+<!-- ======================================================= 20 · PILA VERDE (gamificação)
+     Inspirado no Pila Verde de Santiago (RS): moeda verde que premia práticas sustentáveis.
+     Aqui: quem anda de ônibus, bicicleta, a pé ou divide a corrida ganha pilas e troca por passagem,
+     desconto no comércio local ou uma muda plantada na cidade. Meta coletiva > ranking individual. -->
+<section class="screen" id="s20" data-header="back" data-title="Pila Verde" data-back="s01">
+  <main class="content">
+    <!-- Saldo + nível -->
+    <div class="card pila-hero">
+      <div class="row between top">
+        <div>
+          <div class="small" style="color:#ffffffb3">Seu saldo</div>
+          <div class="pila-bal"><span class="pila-coin">P</span><span data-pila>38</span><small>pilas</small></div>
+        </div>
+        <span class="lvl"><span class="ms fill">eco</span>Muda</span>
+      </div>
+      <div class="small mt-16" style="color:#ffffffcc">Faltam <b data-pila-next>12</b> pilas para virar <b>Árvore</b></div>
+      <div class="progress mt-8" style="background:#ffffff33"><i data-pila-bar style="width:76%;background:#A5F4C0"></i></div>
+      <div class="lvl-steps mt-8"><span class="done">Broto</span><span class="done">Muda</span><span>Árvore</span><span>Bosque</span></div>
+    </div>
+
+    <!-- Desafio da semana -->
+    <div class="sec"><h2>Desafio da semana</h2><span class="small muted">termina dom</span></div>
+    <div class="card row">
+      <span class="icon-sq lg"><span class="ms">directions_bus</span></span>
+      <div class="grow">
+        <div class="sb">Vá 5 vezes de ônibus ao campus</div>
+        <div class="progress mt-8"><i style="width:60%"></i></div>
+        <div class="small muted mt-4">3 de 5 • prêmio de <b class="green">+10 pilas</b></div>
+      </div>
+    </div>
+
+    <!-- Como ganhar -->
+    <div class="sec"><h2>Como ganhar</h2></div>
+    <div class="card list">
+      <div class="item"><span class="icon-sq"><span class="ms">directions_bus</span></span><div class="grow"><div class="sb">Viagem de ônibus</div><div class="small muted">Validada pelo cartão Move</div></div><span class="earn">+3</span></div>
+      <div class="item"><span class="icon-sq"><span class="ms">pedal_bike</span></span><div class="grow"><div class="sb">Bicicleta ou a pé</div><div class="small muted">Trajetos acima de 1 km</div></div><span class="earn">+4</span></div>
+      <div class="item"><span class="icon-sq"><span class="ms">group</span></span><div class="grow"><div class="sb">Corrida compartilhada</div><div class="small muted">Dividir o carro com colegas</div></div><span class="earn">+2</span></div>
+      <div class="item"><span class="icon-sq"><span class="ms">campaign</span></span><div class="grow"><div class="sb">Responder pesquisa ou reportar problema</div><div class="small muted">Ajuda a melhorar as linhas</div></div><span class="earn">+5</span></div>
+    </div>
+
+    <!-- Trocar -->
+    <div class="sec"><h2>Trocar pilas</h2></div>
+    <div class="redeem">
+      <button data-action="redeem" data-cost="20" data-msg="Passagem de ônibus adicionada ao cartão"><span class="icon-sq lg"><span class="ms">confirmation_number</span></span><div class="t">Passagem de ônibus</div><div class="cost">20 pilas</div></button>
+      <button data-action="redeem" data-cost="15" data-msg="Cupom de R$ 3 no Move Pop ativado"><span class="icon-sq lg"><span class="ms">directions_car</span></span><div class="t">R$ 3 no Move Pop</div><div class="cost">15 pilas</div></button>
+      <button data-action="redeem" data-cost="25" data-msg="Cupom de 10% na Feira do Produtor gerado"><span class="icon-sq lg"><span class="ms">storefront</span></span><div class="t">10% na Feira do Produtor</div><div class="cost">25 pilas</div></button>
+      <button data-action="redeem" data-cost="30" data-msg="Uma muda será plantada no seu nome 🌱"><span class="icon-sq lg"><span class="ms">park</span></span><div class="t">Plantar uma árvore</div><div class="cost">30 pilas</div></button>
+    </div>
+
+    <!-- Meta coletiva -->
+    <div class="card mt-24" style="background:var(--brand-soft);border-color:transparent;box-shadow:none">
+      <div class="row gap-8"><span class="ms green">forest</span><div class="sb">Meta de Ijuí: 1.000 árvores em 2026</div></div>
+      <div class="progress mt-12" style="background:#ffffff99"><i style="width:64%"></i></div>
+      <div class="small muted mt-8">642 plantadas com pilas trocadas • 12 t de CO₂ evitadas no mês</div>
+    </div>
+  </main>
+</section>
+
+<!-- Aviso de sem internet (aparece por cima de qualquer tela) -->
+<div class="offline" id="offline" role="status">
+  <span class="ms">wifi_off</span>
+  <div class="grow"><div class="sb">Sem internet</div><div class="small">Mostrando horários salvos. Pedir carro fica indisponível.</div></div>
+  <button data-action="reconnect">Tentar</button>
+</div>
+
+<div class="toast" id="toast"><span class="ms">check_circle</span><span></span></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="rotas.js"></script>
+<script src="mapa.js"></script>
+<script src="app.js"></script>
+<script src="teste.js"></script>
+</body>
+</html>

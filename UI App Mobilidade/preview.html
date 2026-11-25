@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Telas · Move Ijuí</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --brand:#00522f; --brand-soft:#e3f1e8; --ink:#0b1c30; --muted:#66758a; --faint:#94a1b2; --line:#e4e9f0;
+    --bg:#eef3ef; --ease:cubic-bezier(.32,.72,0,1);
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { margin:0; }
+  body { font:15px/1.5 "Plus Jakarta Sans", system-ui, sans-serif; color:var(--ink); background:radial-gradient(1400px 900px at 70% 0%, #f7faf8 0%, var(--bg) 55%, #e6ede8 100%) fixed; min-height:100vh; }
+  button { font:inherit; color:inherit; }
+
+  /* ---------- Topo ---------- */
+  header { position:sticky; top:0; z-index:5; background:#ffffffcc; backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+  .bar { max-width:1276px; margin:0 auto; padding:20px 48px; display:flex; align-items:center; gap:24px; }
+  .bar h1 { font-size:20px; margin:0; letter-spacing:-.01em; }
+  .bar .sub { color:var(--muted); font-size:14px; }
+  .seg { margin-left:auto; display:flex; background:#eef2f6; border-radius:999px; padding:4px; }
+  .seg button { border:0; background:none; padding:8px 18px; border-radius:999px; cursor:pointer; color:var(--muted); font-size:14px; transition:background .25s var(--ease), color .2s, box-shadow .25s; }
+  .seg button.on { background:#fff; color:var(--ink); font-weight:600; box-shadow:0 1px 3px #0b1c3014; }
+  .cta { display:inline-flex; align-items:center; gap:8px; background:var(--brand); color:#fff; text-decoration:none; font-size:14px; font-weight:600; padding:10px 18px; border-radius:999px; transition:transform .2s var(--ease), box-shadow .2s; }
+  .cta:hover { transform:translateY(-1px); box-shadow:0 8px 20px -8px #00522f80; }
+
+  /* ---------- Galeria ---------- */
+  main { max-width:1276px; margin:0 auto; padding:56px 48px 112px; }
+  section + section { margin-top:72px; }
+  .sec-head { display:flex; align-items:baseline; gap:12px; margin-bottom:28px; }
+  .sec-head h2 { font-size:18px; margin:0; letter-spacing:-.01em; }
+  .sec-head span { color:var(--faint); font-size:14px; }
+  .grid { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:48px 40px; max-width:1180px; }
+  .grid.wide { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  @media (max-width: 1100px) { .grid { gap:40px 24px; } }
+  .card { cursor:zoom-in; }
+  .card .shot { border-radius:22px; overflow:hidden; background:#F8F9FF; box-shadow:0 1px 2px #0b1c300f, 0 12px 28px -14px #0b1c3033; transition:transform .35s var(--ease), box-shadow .35s var(--ease); }
+  .card:hover .shot { transform:translateY(-4px); box-shadow:0 1px 2px #0b1c300f, 0 22px 40px -16px #0b1c3047; }
+  .card svg { display:block; width:100%; height:auto; }
+  .phone-shot { position:relative; aspect-ratio:390 / 844; overflow:hidden; background:#F8F9FF; }
+  .phone-shot iframe { position:absolute; left:0; top:0; width:390px; height:844px; border:0; transform-origin:0 0; transform:scale(var(--k, 1)); }
+  .card .phone-shot iframe { pointer-events:none; }
+  .card .meta { display:flex; gap:10px; align-items:baseline; margin:16px 4px 0; }
+  .card .n { font-size:12px; color:var(--faint); font-variant-numeric:tabular-nums; }
+  .card .t { font-weight:600; font-size:15px; }
+  .card .s { color:var(--muted); font-size:13px; margin:2px 4px 0 26px; }
+  .wide .card .s { margin-left:4px; }
+
+  /* ---------- Prancha ---------- */
+  #board { display:none; position:fixed; inset:var(--top, 81px) 0 0 0; overflow:hidden; background:#2f3437; cursor:grab; }
+  #board.show { display:block; }
+  #board img { position:absolute; left:0; top:0; transform-origin:0 0; user-select:none; -webkit-user-drag:none; }
+  #board .hint { position:absolute; left:50%; bottom:28px; transform:translateX(-50%); display:flex; gap:20px; background:#0b1c30cc; backdrop-filter:blur(8px); color:#fff; padding:10px 20px; border-radius:999px; font-size:13px; white-space:nowrap; }
+  #board .hint b { font-weight:600; }
+
+  /* ---------- Visualização ampliada ---------- */
+  #lb { position:fixed; inset:0; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; padding:32px; background:#0b1c30e0; backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:opacity .3s var(--ease); }
+  #lb.show { opacity:1; pointer-events:auto; }
+  #lb .cap { text-align:center; color:#fff; }
+  #lb .cap .f { font-size:12px; font-weight:600; color:#ffffff80; }
+  #lb .cap .t { font-size:20px; font-weight:600; margin-top:4px; }
+  #lb .frame { border-radius:28px; overflow:hidden; background:#F8F9FF; box-shadow:0 40px 80px -20px #0008; transform:scale(.96); transition:transform .4s var(--ease); }
+  #lb.show .frame { transform:none; }
+  #lb .frame svg { display:block; }
+  #lb .ctrl { display:flex; gap:16px; }
+  .round { width:48px; height:48px; border-radius:50%; border:0; background:#ffffff1f; cursor:pointer; display:grid; place-items:center; transition:background .2s, transform .2s var(--ease); }
+  .round:hover { background:#ffffff33; }
+  .round:active { transform:scale(.94); }
+  .round svg { width:20px; height:20px; stroke:#fff; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  #lb .close { position:absolute; top:24px; right:24px; }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration:.01s !important; } }
+  @media (max-width: 760px) {
+    .bar { padding:16px 20px; flex-wrap:wrap; gap:12px; }
+    .bar .sub { display:none; }
+    .seg { margin-left:0; }
+    main { padding:32px 20px 64px; }
+    .grid { grid-template-columns:repeat(2, 1fr); gap:28px 16px; }
+    .grid.wide { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <h1>Move Ijuí</h1>
+    <span class="sub">19 telas em HTML • toque numa tela para usar</span>
+    <div class="seg">
+      <button id="bGal" class="on">Telas</button>
+      <button id="bBoard">Design original (SVG)</button>
+    </div>
+    <a class="cta" href="prototipo.html">Abrir protótipo →</a>
+  </div>
+</header>
+
+<main id="gallery"></main>
+
+<div id="board">
+  <img src="app.svg" alt="Prancha completa do Move Ijuí" draggable="false">
+  <div class="hint"><span><b>Arraste</b> para mover</span><span><b>Role</b> para dar zoom</span><span><b>0</b> enquadra tudo</span></div>
+</div>
+
+<div id="lb" aria-hidden="true">
+  <button class="round close" id="lbClose" aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <div class="cap"><div class="f"></div><div class="t"></div></div>
+  <div class="frame"></div>
+  <div class="ctrl">
+    <button class="round" id="prev" aria-label="Anterior"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <button class="round" id="next" aria-label="Próxima"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+  </div>
+</div>
+
+<script>
+// Mapa das regiões do app.svg (coordenadas do viewBox original). O arquivo não é alterado.
+const W = 6128, H = 2345;
+const sections = [
+  { title: "De ônibus", note: "5 telas", items: [
+    ["01", "Início", "Busca e atalhos"],
+    ["02", "Rotas", "Ônibus, carro ou bicicleta"],
+    ["03", "Linha 03", "Itinerário passo a passo"],
+    ["05", "Ao vivo", "Acompanhando a viagem"],
+    ["08", "Viagem concluída", "Resumo e pesquisa"],
+  ]},
+  { title: "De carro", note: "7 telas", items: [
+    ["09", "Pedir carro", "Embarque, destino e quando"],
+    ["10", "Categoria", "Pop, Conforto ou Família"],
+    ["11", "Buscando motorista", "Procurando por perto"],
+    ["12", "Motorista a caminho", "Tempo, PIN e contato"],
+    ["13", "Motorista chegando", "Código de embarque"],
+    ["06", "Corrida em andamento", "Rota e motorista"],
+    ["07", "Avaliar corrida", "Total pago e avaliação"],
+  ]},
+  { title: "Abas e conta", note: "4 telas", items: [
+    ["04", "Pontos", "Próximos ônibus"],
+    ["14", "Alertas", "Atrasos e obras"],
+    ["15", "Perfil", "Locais salvos e conta"],
+    ["16", "Modo motorista", "Aceitar corridas"],
+  ]},
+  { title: "Imprevistos e agendamento", note: "3 telas", items: [
+    ["19", "Corrida agendada", "Quando você escolhe Agendar"],
+    ["17", "Sem motoristas", "Categoria lotada, com alternativas"],
+    ["18", "Corrida cancelada", "Sem cobrança, procurar outro"],
+  ]},
+  { title: "Design system", note: "base visual", wide: true, items: [
+    ["", "Cores", "Modo claro e escuro", 40, 48, 792, 1536],
+    ["", "Tipografia", "Plus Jakarta Sans", 40, 1608, 388, 697],
+    ["", "Iconografia", "Ícones do cabeçalho e da navegação", 444, 1608, 388, 296],
+    ["", "Componentes", "Cabeçalhos e barras de navegação", 1160, 80, 876, 280],
+  ]},
+];
+
+const NS = "http://www.w3.org/2000/svg";
+function crop(x, y, w, h) {
+  const s = document.createElementNS(NS, "svg");
+  s.setAttribute("viewBox", `${x} ${y} ${w} ${h}`);
+  const i = document.createElementNS(NS, "image");
+  i.setAttribute("href", "app.svg"); i.setAttribute("width", W); i.setAttribute("height", H);
+  s.appendChild(i); return s;
+}
+// Telas do app: iframe do app em HTML, escalado para caber (k = largura / 390)
+const ro = new ResizeObserver(es => es.forEach(e => e.target.style.setProperty("--k", e.contentRect.width / 390)));
+function htmlShot(n, live) {
+  const wrap = document.createElement("div"); wrap.className = "phone-shot";
+  const f = document.createElement("iframe");
+  f.src = `app/index.html${live ? "" : "?still"}#s${n}`; f.title = "Tela " + n; f.loading = live ? "eager" : "lazy";
+  wrap.appendChild(f); ro.observe(wrap); return wrap;
+}
+const flat = [];
+const gal = document.getElementById("gallery");
+for (const sec of sections) {
+  const el = document.createElement("section");
+  el.innerHTML = `<div class="sec-head"><h2></h2><span></span></div><div class="grid${sec.wide ? " wide" : ""}"></div>`;
+  el.querySelector("h2").textContent = sec.title;
+  el.querySelector("span").textContent = sec.note;
+  const grid = el.querySelector(".grid");
+  sec.items.forEach(([n, t, s, x, y, w = 390, h = 844], k) => {
+    const idx = flat.push({ n, t, s, x, y, w, h, flow: sec.title, pos: `${k + 1} de ${sec.items.length}` }) - 1;
+    const c = document.createElement("div"); c.className = "card";
+    const shot = document.createElement("div"); shot.className = "shot"; shot.appendChild(n ? htmlShot(n, false) : crop(x, y, w, h));
+    c.appendChild(shot);
+    c.insertAdjacentHTML("beforeend", `<div class="meta"><span class="n"></span><span class="t"></span></div><div class="s"></div>`);
+    c.querySelector(".n").textContent = n; c.querySelector(".t").textContent = t; c.querySelector(".s").textContent = s;
+    c.onclick = () => openLb(idx);
+    grid.appendChild(c);
+  });
+  gal.appendChild(el);
+}
+
+// Escala das miniaturas também calculada direto (não depende só do ResizeObserver)
+function sizeShots() { document.querySelectorAll("#gallery .phone-shot").forEach(p => p.clientWidth && p.style.setProperty("--k", p.clientWidth / 390)); }
+sizeShots(); addEventListener("resize", sizeShots); addEventListener("load", sizeShots);
+
+// ---------- Visualização ampliada ----------
+const lb = document.getElementById("lb"); let cur = 0;
+function openLb(i) {
+  cur = (i + flat.length) % flat.length; const f = flat[cur];
+  // cabe na tela deixando espaço para título e botões
+  const k = Math.min((innerHeight - 220) / f.h, (innerWidth - 160) / f.w, 1);
+  let n;
+  if (f.n) { n = htmlShot(f.n, true); n.style.width = Math.round(390 * k) + "px"; n.style.setProperty("--k", Math.round(390 * k) / 390); }
+  else { n = crop(f.x, f.y, f.w, f.h); n.setAttribute("width", Math.round(f.w * k)); n.setAttribute("height", Math.round(f.h * k)); }
+  lb.querySelector(".frame").replaceChildren(n);
+  lb.querySelector(".f").textContent = `${f.flow} · ${f.pos}`;
+  lb.querySelector(".t").textContent = f.t;
+  lb.classList.add("show"); lb.setAttribute("aria-hidden", "false");
+  history.replaceState(null, "", "#tela-" + (cur + 1).toString().padStart(2, "0"));
+}
+function closeLb() { setTimeout(() => lb.querySelector(".frame").replaceChildren(), 300); lb.classList.remove("show"); lb.setAttribute("aria-hidden", "true"); history.replaceState(null, "", location.pathname); }
+document.getElementById("prev").onclick = e => { e.stopPropagation(); openLb(cur - 1); };
+document.getElementById("next").onclick = e => { e.stopPropagation(); openLb(cur + 1); };
+document.getElementById("lbClose").onclick = closeLb;
+lb.onclick = e => { if (e.target === lb) closeLb(); };
+addEventListener("keydown", e => {
+  if (lb.classList.contains("show")) {
+    if (e.key === "Escape") closeLb();
+    if (e.key === "ArrowRight") openLb(cur + 1);
+    if (e.key === "ArrowLeft") openLb(cur - 1);
+  } else if (e.key === "0" && board.classList.contains("show")) fit();
+});
+
+// ---------- Prancha com arrastar e zoom ----------
+const board = document.getElementById("board"), img = board.querySelector("img");
+img.width = W; img.height = H;
+let sc = 1, tx = 0, ty = 0;
+const apply = () => img.style.transform = `translate(${tx}px,${ty}px) scale(${sc})`;
+function fit() {
+  const r = board.getBoundingClientRect();
+  sc = Math.min(r.width / W, r.height / H) * .92; tx = (r.width - W * sc) / 2; ty = (r.height - H * sc) / 2;
+  img.style.transition = "transform .5s cubic-bezier(.32,.72,0,1)"; apply();
+  setTimeout(() => img.style.transition = "", 500);
+}
+board.addEventListener("wheel", e => {
+  e.preventDefault(); const r = board.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+  const ns = Math.min(4, Math.max(.05, sc * Math.exp(-e.deltaY * 0.0015)));
+  tx = mx - (mx - tx) * ns / sc; ty = my - (my - ty) * ns / sc; sc = ns; apply();
+}, { passive: false });
+let drag = null;
+board.onpointerdown = e => { drag = [e.clientX - tx, e.clientY - ty]; board.setPointerCapture(e.pointerId); board.style.cursor = "grabbing"; };
+board.onpointermove = e => { if (drag) { tx = e.clientX - drag[0]; ty = e.clientY - drag[1]; apply(); } };
+board.onpointerup = () => { drag = null; board.style.cursor = "grab"; };
+
+const bG = document.getElementById("bGal"), bB = document.getElementById("bBoard");
+function view(boardOn) {
+  bB.classList.toggle("on", boardOn); bG.classList.toggle("on", !boardOn);
+  board.style.setProperty("--top", document.querySelector("header").offsetHeight + "px");
+  board.classList.toggle("show", boardOn); gal.style.display = boardOn ? "none" : "";
+  if (boardOn) fit();
+}
+bG.onclick = () => view(false);
+bB.onclick = () => view(true);
+addEventListener("resize", () => { if (board.classList.contains("show")) fit(); });
+// Link direto para uma tela ampliada: preview.html#tela-03
+const m = location.hash.match(/^#tela-(\d+)$/);
+if (m && flat[m[1] - 1]) openLb(m[1] - 1);
+</script>
+</body>
+</html>

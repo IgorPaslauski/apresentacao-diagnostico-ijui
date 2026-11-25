@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Protótipo · Move Ijuí</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F8F9FF">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --brand:#00522f; --brand-soft:#e3f1e8; --ink:#0b1c30; --muted:#66758a; --faint:#94a1b2; --line:#e4e9f0;
+    --bg:#eef3ef; --ease:cubic-bezier(.32,.72,0,1);
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { margin:0; height:100%; }
+  body {
+    font:15px/1.5 "Plus Jakarta Sans", system-ui, sans-serif; color:var(--ink); display:flex; overflow:hidden;
+    background:radial-gradient(1200px 800px at 70% 40%, #f7faf8 0%, var(--bg) 60%, #e6ede8 100%);
+  }
+  button { font:inherit; color:inherit; }
+
+  /* ---------- Painel lateral ---------- */
+  aside { width:304px; flex:none; background:#ffffffcc; backdrop-filter:blur(8px); border-right:1px solid var(--line); display:flex; flex-direction:column; }
+  .brand { padding:36px 32px 8px; }
+  .brand .tag { display:inline-flex; align-items:center; gap:8px; font-size:12px; font-weight:600; color:var(--brand); background:var(--brand-soft); padding:4px 10px; border-radius:999px; }
+  .brand .tag::before { content:""; width:6px; height:6px; border-radius:50%; background:var(--brand); }
+  .brand h1 { font-size:22px; line-height:1.25; margin:16px 0 8px; letter-spacing:-.01em; }
+  .brand p { margin:0; color:var(--muted); font-size:14px; }
+  #list { overflow:auto; padding:16px 20px 24px; flex:1; scrollbar-width:thin; }
+  #list .grp { font-size:12px; font-weight:600; color:var(--faint); margin:24px 12px 8px; }
+  #list button { display:flex; gap:14px; align-items:center; width:100%; text-align:left; border:0; background:none; padding:9px 12px; border-radius:12px; cursor:pointer; color:var(--muted); transition:background .2s, color .2s; }
+  #list button .n { width:20px; flex:none; font-size:12px; color:var(--faint); font-variant-numeric:tabular-nums; transition:color .2s; }
+  #list button:hover { background:#f2f5f8; color:var(--ink); }
+  #list button.on { background:var(--brand-soft); color:var(--brand); font-weight:600; }
+  #list button.on .n { color:var(--brand); }
+  .foot { padding:20px 32px 28px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:12px; }
+  .foot a { color:var(--muted); font-size:13px; text-decoration:none; }
+  .sim-title { font-size:12px; font-weight:600; color:var(--faint); }
+  .switch { display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:14px; cursor:pointer; user-select:none; }
+  .switch input { appearance:none; margin:0; width:38px; height:22px; border-radius:999px; background:#d5dde6; position:relative; cursor:pointer; transition:background .25s; flex:none; }
+  .switch input::after { content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; box-shadow:0 1px 3px #0003; transition:transform .25s var(--ease); }
+  .switch input:checked { background:var(--brand); }
+  .switch input:checked::after { transform:translateX(16px); }
+  .sim-btn { text-align:left; border:1px solid var(--line); background:#fff; border-radius:10px; padding:9px 12px; font-size:13px; cursor:pointer; transition:background .2s; }
+  .sim-btn:hover { background:#f2f5f8; }
+  .theme-seg { display:flex; background:#eef2f6; border-radius:10px; padding:3px; }
+  .theme-seg button { flex:1; border:0; background:none; padding:7px 4px; border-radius:8px; font-size:12px; color:var(--muted); cursor:pointer; transition:background .2s, color .2s; }
+  .theme-seg button.on { background:#fff; color:var(--ink); font-weight:600; box-shadow:0 1px 3px #0b1c3014; }
+  .sim-hint { margin:0; font-size:12px; line-height:1.5; color:var(--faint); }
+  .foot a:hover { color:var(--brand); }
+
+  /* ---------- Palco ---------- */
+  /* Celular à esquerda, título + navegação ao lado: o celular aproveita toda a altura */
+  #stage { flex:1; display:flex; flex-direction:row; align-items:center; justify-content:center; gap:56px; padding:24px 40px; min-width:0; }
+  #side { width:240px; flex:none; display:flex; flex-direction:column; gap:28px; }
+  #caption { text-align:left; min-height:96px; }
+  #caption .title { font-size:28px !important; line-height:1.2; }
+  #caption .desc { font-size:14px; color:var(--muted); margin-top:10px; line-height:1.55; }
+  #side .keys { font-size:12px; color:var(--faint); display:flex; align-items:center; gap:6px; }
+  #side .keys kbd { font:inherit; font-size:11px; border:1px solid var(--line); background:#fff; border-radius:6px; padding:1px 6px; color:var(--muted); }
+  /* Janela estreita: volta a empilhar embaixo do celular */
+  @media (max-width: 1100px) {
+    #stage { flex-direction:column; gap:20px; }
+    #side { width:auto; align-items:center; gap:16px; }
+    #caption { text-align:center; min-height:0; }
+    #caption .title { font-size:20px !important; }
+    #caption .desc, #side .keys { display:none; }
+  }
+  #caption .flow { font-size:12px; font-weight:600; color:var(--faint); letter-spacing:.02em; }
+  #caption .title { font-size:20px; font-weight:600; margin-top:4px; letter-spacing:-.01em; }
+  #caption > * { transition:opacity .25s, transform .35s var(--ease); }
+  #caption.swap > * { opacity:0; transform:translateY(6px); }
+  #phone { position:relative; border-radius:52px; background:#0b1c30; padding:12px; box-shadow:0 2px 0 #ffffff14 inset, 0 40px 80px -20px #0b1c3047, 0 12px 24px -12px #0b1c3033; }
+  #viewport { width:390px; height:844px; overflow:hidden; border-radius:40px; background:#F8F9FF; transform-origin:0 0; }
+  #viewport iframe { width:390px; height:844px; border:0; display:block; }
+
+  #nav { display:flex; align-items:center; gap:20px; height:44px; }
+  #nav button { width:44px; height:44px; border-radius:50%; border:1px solid var(--line); background:#fff; cursor:pointer; display:grid; place-items:center; box-shadow:0 1px 2px #0b1c300d; transition:transform .2s var(--ease), box-shadow .2s, opacity .2s; }
+  #nav button:hover { transform:translateY(-1px); box-shadow:0 6px 16px -6px #0b1c3033; }
+  #nav button:active { transform:scale(.94); }
+  #nav button:disabled { opacity:.35; cursor:default; transform:none; box-shadow:none; }
+  #nav svg { width:18px; height:18px; stroke:var(--ink); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  #dots { display:flex; gap:6px; align-items:center; }
+  #dots i { width:6px; height:6px; border-radius:999px; background:#c9d3dd; transition:width .35s var(--ease), background .35s; cursor:pointer; }
+  #dots i.on { width:20px; background:var(--brand); }
+
+  /* ---------- Feedback ---------- */
+  .fb-open { display:flex; align-items:center; gap:10px; border:0; background:var(--brand); color:#fff; border-radius:14px; padding:12px 16px; font-weight:600; font-size:14px; cursor:pointer; box-shadow:0 8px 20px -10px #00522f99; transition:transform .2s var(--ease), filter .2s; }
+  .fb-open:hover { filter:brightness(1.12); transform:translateY(-1px); }
+  .fb-open svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .fb-open small { display:block; font-weight:500; font-size:12px; opacity:.8; }
+  /* no celular: aba fixa na borda direita */
+  .fb-tab { display:none; position:fixed; right:0; top:42%; z-index:40; writing-mode:vertical-rl; transform:rotate(180deg); border:0; background:var(--brand); color:#fff; font-weight:600; font-size:13px; padding:14px 8px; border-radius:0 10px 10px 0; box-shadow:0 4px 14px #0b1c3033; cursor:pointer; }
+
+  #fb { position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; background:#0b1c3066; opacity:0; pointer-events:none; transition:opacity .25s; padding:20px; }
+  #fb.show { opacity:1; pointer-events:auto; }
+  #fb .box { width:100%; max-width:440px; max-height:100%; overflow:auto; background:#fff; border-radius:22px; padding:28px; box-shadow:0 30px 60px -20px #0b1c3066; transform:translateY(16px) scale(.98); transition:transform .35s var(--ease); }
+  #fb.show .box { transform:none; }
+  #fb h2 { margin:0; font-size:21px; letter-spacing:-.01em; }
+  #fb .sub { margin:6px 0 0; color:var(--muted); font-size:14px; }
+  #fb .lbl { display:block; font-size:13px; font-weight:600; margin:20px 0 8px; }
+  #fb .lbl span { font-weight:500; color:var(--faint); }
+  #fb .screen-pill { display:inline-flex; align-items:center; gap:6px; background:var(--brand-soft); color:var(--brand); font-size:13px; font-weight:600; border-radius:999px; padding:5px 12px; margin-top:14px; }
+  #fb .moods { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  #fb .moods button { border:1.5px solid var(--line); background:#fff; border-radius:14px; padding:12px 6px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:13px; font-weight:600; color:var(--muted); transition:border-color .2s, background .2s, color .2s; }
+  #fb .moods button b { font-size:24px; line-height:1; }
+  #fb .moods button.on { border-color:var(--brand); background:var(--brand-soft); color:var(--brand); }
+  #fb .tags { display:flex; flex-wrap:wrap; gap:8px; }
+  #fb .tags button { border:0; background:#eef2f6; color:var(--ink); border-radius:999px; padding:8px 12px; font-size:13px; cursor:pointer; transition:background .2s, color .2s; }
+  #fb .tags button.on { background:var(--brand); color:#fff; }
+  #fb textarea, #fb input { width:100%; border:1px solid var(--line); border-radius:12px; padding:12px 14px; font:inherit; font-size:14px; color:var(--ink); background:#fafbfc; outline:none; resize:vertical; }
+  #fb textarea { min-height:96px; }
+  #fb textarea:focus, #fb input:focus { border-color:var(--brand); background:#fff; }
+  #fb .actions { display:flex; gap:10px; margin-top:24px; }
+  #fb .actions button { flex:1; height:48px; border-radius:12px; border:0; font-weight:600; font-size:15px; cursor:pointer; }
+  #fb .send { background:var(--brand); color:#fff; }
+  #fb .send:disabled { opacity:.45; cursor:default; }
+  #fb .cancel { background:#eef2f6; color:var(--ink); flex:0 0 110px !important; }
+  #fb .done { text-align:center; padding:12px 0 4px; }
+  #fb .done .ok { width:64px; height:64px; border-radius:50%; background:var(--brand-soft); color:var(--brand); display:grid; place-items:center; margin:0 auto 14px; font-size:30px; }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration:.01s !important; } }
+
+  /* No celular de verdade, abre o app direto em tela cheia */
+  @media (max-width: 700px) {
+    aside, #side { display:none; }
+    body { background:#F8F9FF; }
+    #stage { padding:0; gap:0; }
+    #phone { padding:0; border-radius:0; box-shadow:none; background:none; }
+    #viewport { border-radius:0; }
+    .fb-tab { display:block; }
+  }
+</style>
+</head>
+<body>
+<aside>
+  <div class="brand">
+    <span class="tag">Protótipo navegável</span>
+    <h1>Move Ijuí</h1>
+    <p>Toque, role e use como um app de verdade. Cada fluxo segue do começo ao fim.</p>
+  </div>
+  <div id="list"></div>
+  <div class="foot">
+    <div class="sim-title">Tema e situações</div>
+    <div class="theme-seg" id="simTheme" role="group" aria-label="Tema do app">
+      <button data-v="auto" class="on">Automático</button><button data-v="light">Claro</button><button data-v="dark">Escuro</button>
+    </div>
+    <label class="switch">Sem internet <input type="checkbox" id="simOffline"></label>
+    <button class="sim-btn" id="simCancel">Motorista cancela a corrida</button>
+    <p class="sim-hint">Dica: escolher Move Família mostra a tela de “sem motoristas”, e “Agendar” leva à corrida agendada.</p>
+    <div class="sim-title" style="margin-top:8px">Teste com usuários</div>
+    <a href="app/index.html?teste" target="_blank">Iniciar teste (3 tarefas) ↗</a>
+    <a href="resultados.html" target="_blank">Ver resultados dos testes ↗</a>
+    <a href="app/index.html" target="_blank">Abrir o app em tela cheia ↗</a>
+    <a href="preview.html">Ver todas as telas lado a lado →</a>
+  </div>
+</aside>
+<div id="stage">
+  <div id="phone"><div id="viewport"><iframe id="app" title="App Move Ijuí"></iframe></div></div>
+  <div id="side">
+    <div id="caption"><div class="flow"></div><div class="title"></div><div class="desc"></div></div>
+    <div id="nav">
+      <button id="prevBtn" title="Tela anterior (←)" aria-label="Tela anterior"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div id="dots"></div>
+      <button id="nextBtn" title="Próxima tela (→)" aria-label="Próxima tela"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+    <div class="keys"><kbd>←</kbd><kbd>→</kbd> para trocar de tela</div>
+    <button class="fb-open" data-fb><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Dar feedback<small>O que te incomodou nesta tela?</small></span></button>
+  </div>
+</div>
+<button class="fb-tab" data-fb>Feedback</button>
+
+<!-- Feedback: vai para um Google Form (configurar FEEDBACK no script) -->
+<div id="fb" role="dialog" aria-modal="true" aria-labelledby="fbTitle">
+  <div class="box">
+    <form id="fbForm">
+      <h2 id="fbTitle">Como foi usar esta tela?</h2>
+      <p class="sub">Sua opinião ajuda a melhorar o Move Ijuí. Leva menos de 1 minuto.</p>
+      <span class="screen-pill">Tela: <span id="fbScreen">Início</span></span>
+
+      <span class="lbl">No geral, a tela foi…</span>
+      <div class="moods" id="fbMood">
+        <button type="button" data-v="Fácil"><b>😀</b>Fácil</button>
+        <button type="button" data-v="Ok"><b>😐</b>Ok</button>
+        <button type="button" data-v="Confusa"><b>😕</b>Confusa</button>
+      </div>
+
+      <span class="lbl">O que incomodou? <span>(pode marcar vários)</span></span>
+      <div class="tags" id="fbTags">
+        <button type="button">Difícil de achar</button><button type="button">Texto pequeno</button><button type="button">Muita informação</button>
+        <button type="button">Não entendi um botão</button><button type="button">Lento</button><button type="button">Nada, gostei</button>
+      </div>
+
+      <label class="lbl" for="fbText">Conte com suas palavras <span>(opcional)</span></label>
+      <textarea id="fbText" placeholder="Ex.: não achei onde mudar o pagamento…"></textarea>
+
+      <label class="lbl" for="fbWho">Quem é você? <span>(opcional)</span></label>
+      <input id="fbWho" placeholder="Ex.: estudante, usa ônibus todo dia">
+
+      <div class="actions"><button type="button" class="cancel" data-fb-close>Cancelar</button><button type="submit" class="send" id="fbSend" disabled>Enviar feedback</button></div>
+    </form>
+    <div class="done" id="fbDone" hidden>
+      <div class="ok">✓</div>
+      <h2>Obrigado!</h2>
+      <p class="sub">Recebemos seu feedback sobre a tela <b id="fbDoneScreen"></b>.</p>
+      <div class="actions"><button type="button" class="send" data-fb-close>Continuar testando</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const S = {
+  s01: "Início", s02: "Rotas", s03: "Linha 03", s05: "Ao vivo", s08: "Viagem concluída",
+  s09: "Pedir carro", s10: "Categoria", s11: "Buscando motorista", s12: "Seu motorista", s06: "Corrida em andamento", s07: "Avaliar corrida",
+  s04: "Pontos", s14: "Alertas", s15: "Perfil", s16: "Modo motorista",
+  s19: "Corrida agendada", s17: "Sem motoristas", s18: "Corrida cancelada", s20: "Pila Verde",
+};
+// Uma frase por tela, mostrada ao lado do celular
+const D = {
+  s01: "Busca com “Agora” embutido, serviços em ícones e destinos recentes.",
+  s02: "Compara ônibus, carro e bicicleta por tempo e preço.",
+  s03: "Itinerário passo a passo antes de sair.",
+  s05: "O ônibus anda no mapa real; aviso antes de descer.",
+  s08: "Resumo da viagem e recompensa em Pila Verde.",
+  s09: "Destino e horário: agora ou agendado.",
+  s10: "Rota no mapa, categorias com foto, pagamento acima do botão.",
+  s11: "Busca com tempo visível e opção de cancelar.",
+  s12: "Placa em destaque, mensagem rápida e atalhos de segurança.",
+  s06: "Trajeto ao vivo com compartilhar, segurança e emergência.",
+  s07: "Avaliação rápida com elogios e gorjeta opcional.",
+  s04: "Pontos próximos com os ônibus chegando.",
+  s14: "Atrasos e obras com alternativa sugerida.",
+  s15: "Saldo de pilas, locais salvos e conta.",
+  s16: "Pedido de corrida com tempo para aceitar.",
+  s19: "Confirmação do agendamento.",
+  s17: "Categoria lotada: sugere outra opção ou ônibus.",
+  s18: "Cancelamento sem cobrança e próximo passo.",
+  s20: "Gamificação inspirada no Pila Verde de Santiago: ganhe andando de ônibus, bike ou a pé e troque por passagem, desconto ou árvore.",
+};
+const FLOWS = [
+  ["De ônibus", ["s01", "s02", "s03", "s05", "s08"]],
+  ["De carro", ["s09", "s10", "s11", "s12", "s06", "s07"]],
+  ["Abas e conta", ["s04", "s14", "s15", "s20", "s16"]],
+  ["Imprevistos e agendamento", ["s19", "s17", "s18"]],
+];
+const order = FLOWS.flatMap(([, ids]) => ids);
+const frame = document.getElementById("app");
+let cur = null;
+
+const start = S[location.hash.slice(1)] ? location.hash.slice(1) : "s01";
+frame.src = "app/index.html#" + start;
+
+// O app avisa a cada troca de tela; o protótipo só acompanha
+addEventListener("message", e => { if (e.data && e.data.moveIjui === "screen") update(e.data.id); });
+function go(id) { frame.contentWindow.postMessage({ moveIjui: "go", id }, "*"); }
+const simulate = (what, extra = {}) => frame.contentWindow.postMessage({ moveIjui: "simulate", what, ...extra }, "*");
+document.getElementById("simOffline").onchange = e => simulate("offline", { on: e.target.checked });
+document.getElementById("simCancel").onclick = () => simulate("driver-cancel");
+// Tema: mostra a escolha salva e manda a nova para o app
+const themeSeg = document.getElementById("simTheme");
+const markTheme = v => themeSeg.querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.v === v));
+markTheme(localStorage.getItem("moveIjuiTema") || "auto");
+themeSeg.onclick = e => { const b = e.target.closest("button"); if (!b) return; markTheme(b.dataset.v); simulate("theme", { value: b.dataset.v }); };
+
+// Lista lateral
+const list = document.getElementById("list");
+FLOWS.forEach(([g, ids]) => {
+  list.insertAdjacentHTML("beforeend", `<div class="grp">${g}</div>`);
+  ids.forEach(id => {
+    const b = document.createElement("button"); b.dataset.id = id;
+    b.innerHTML = `<span class="n">${id.slice(1)}</span><span></span>`;
+    b.lastChild.textContent = S[id];
+    b.onclick = () => go(id);
+    list.appendChild(b);
+  });
+});
+
+// Título, pontos e botões
+const caption = document.getElementById("caption"), dots = document.getElementById("dots");
+function update(id) {
+  if (!S[id] || id === cur) return;
+  cur = id;
+  history.replaceState(null, "", "#" + id);
+  document.querySelectorAll("#list button").forEach(b => b.classList.toggle("on", b.dataset.id === id));
+  const [flow, ids] = FLOWS.find(([, ids]) => ids.includes(id));
+  const i = ids.indexOf(id);
+  caption.classList.add("swap");
+  setTimeout(() => {
+    caption.querySelector(".flow").textContent = `${flow} · ${i + 1} de ${ids.length}`;
+    caption.querySelector(".title").textContent = S[id];
+    caption.querySelector(".desc").textContent = D[id] || "";
+    caption.classList.remove("swap");
+  }, 160);
+  if (dots.dataset.flow !== flow) {
+    dots.dataset.flow = flow; dots.replaceChildren();
+    ids.forEach(d => { const el = document.createElement("i"); el.title = S[d]; el.onclick = () => go(d); dots.appendChild(el); });
+  }
+  [...dots.children].forEach((el, k) => el.classList.toggle("on", k === i));
+  const o = order.indexOf(id);
+  document.getElementById("prevBtn").disabled = o === 0;
+  document.getElementById("nextBtn").disabled = o === order.length - 1;
+}
+const step = d => { const o = order.indexOf(cur) + d; if (order[o]) go(order[o]); };
+document.getElementById("prevBtn").onclick = () => step(-1);
+document.getElementById("nextBtn").onclick = () => step(1);
+addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") step(1);
+  if (e.key === "ArrowLeft") step(-1);
+});
+
+// ---------- Feedback ----------
+// Para receber as respostas numa planilha:
+// 1. Crie um Google Form com 5 perguntas de "Resposta curta"/"Parágrafo": Tela, Avaliação, Incômodos, Comentário, Perfil.
+// 2. No Form: ⋮ → "Gerar link pré-preenchido", preencha qualquer coisa e copie o link.
+//    Ele tem o formato .../forms/d/e/<ID>/viewform?entry.111=...&entry.222=...
+// 3. Cole o <ID> em "form" e os números de cada entry abaixo.
+// Enquanto "form" estiver vazio, os feedbacks ficam guardados neste navegador (localStorage "moveIjuiFeedback").
+const FEEDBACK = {
+  form: "",
+  campos: { tela: "entry.", nota: "entry.", incomodos: "entry.", texto: "entry.", perfil: "entry." },
+};
+const fb = document.getElementById("fb"), fbForm = document.getElementById("fbForm"), fbDone = document.getElementById("fbDone");
+const fbMood = document.getElementById("fbMood"), fbTags = document.getElementById("fbTags"), fbSend = document.getElementById("fbSend");
+let fbVal = { nota: "" };
+function openFb() {
+  fbForm.reset(); fbVal = { nota: "" }; fbSend.disabled = true;
+  fbMood.querySelectorAll("button").forEach(b => b.classList.remove("on"));
+  fbTags.querySelectorAll("button").forEach(b => b.classList.remove("on"));
+  document.getElementById("fbScreen").textContent = S[cur] || "Início";
+  fbForm.hidden = false; fbDone.hidden = true; fb.classList.add("show");
+}
+const closeFb = () => fb.classList.remove("show");
+document.querySelectorAll("[data-fb]").forEach(b => b.onclick = openFb);
+fb.addEventListener("click", e => { if (e.target === fb || e.target.closest("[data-fb-close]")) closeFb(); });
+addEventListener("keydown", e => { if (e.key === "Escape") closeFb(); });
+fbMood.onclick = e => {
+  const b = e.target.closest("button"); if (!b) return;
+  fbMood.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
+  fbVal.nota = b.dataset.v; fbSend.disabled = false;
+};
+fbTags.onclick = e => { const b = e.target.closest("button"); if (b) b.classList.toggle("on"); };
+fbForm.onsubmit = async e => {
+  e.preventDefault();
+  const data = {
+    tela: `${cur} · ${S[cur] || ""}`, nota: fbVal.nota,
+    incomodos: [...fbTags.querySelectorAll(".on")].map(b => b.textContent).join(", "),
+    texto: document.getElementById("fbText").value.trim(), perfil: document.getElementById("fbWho").value.trim(),
+  };
+  fbSend.disabled = true; fbSend.textContent = "Enviando…";
+  try {
+    if (FEEDBACK.form) {
+      const body = new URLSearchParams();
+      for (const k in data) body.append(FEEDBACK.campos[k], data[k]);
+      // o Google Forms não devolve CORS: com no-cors o envio funciona, só não dá para ler a resposta
+      await fetch(`https://docs.google.com/forms/d/e/${FEEDBACK.form}/formResponse`, { method: "POST", mode: "no-cors", body });
+    } else {
+      const all = JSON.parse(localStorage.getItem("moveIjuiFeedback") || "[]");
+      all.push({ ...data, quando: new Date().toISOString() });
+      localStorage.setItem("moveIjuiFeedback", JSON.stringify(all));
+    }
+    document.getElementById("fbDoneScreen").textContent = S[cur] || "";
+    fbForm.hidden = true; fbDone.hidden = false;
+  } catch {
+    alert("Não foi possível enviar agora. Verifique a internet e tente de novo.");
+  } finally { fbSend.textContent = "Enviar feedback"; fbSend.disabled = false; }
+};
+
+// Escala para caber na janela (desktop: moldura; celular: tela cheia)
+const vp = document.getElementById("viewport");
+function fit() {
+  const mobile = innerWidth <= 700;
+  // lado a lado: só desconta o respiro vertical; empilhado (<1100px): desconta título e setas embaixo
+  const side = innerWidth > 1100;
+  const k = mobile ? Math.min(innerWidth / 390, innerHeight / 844)
+         : side ? Math.min(1, (innerHeight - 48) / 868, (innerWidth - 304 - 80 - 56 - 240) / 414)
+                : Math.min(1, (innerHeight - 208) / 868, (innerWidth - 384) / 414);
+  vp.style.transform = `scale(${k})`;
+  vp.parentElement.style.width = (mobile ? 390 * k : 390 * k + 24) + "px";
+  vp.parentElement.style.height = (mobile ? 844 * k : 844 * k + 24) + "px";
+}
+addEventListener("resize", fit); fit();
+</script>
+</body>
+</html>
