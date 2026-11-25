@@ -111,6 +111,17 @@
   #fb textarea, #fb input { width:100%; border:1px solid var(--line); border-radius:12px; padding:12px 14px; font:inherit; font-size:14px; color:var(--ink); background:#fafbfc; outline:none; resize:vertical; }
   #fb textarea { min-height:96px; }
   #fb textarea:focus, #fb input:focus { border-color:var(--brand); background:#fff; }
+  #fb .scale { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+  #fb .choice { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  #fb .scale button, #fb .choice button { height:42px; border:1.5px solid var(--line); background:#fff; border-radius:12px; font-size:14px; font-weight:600; color:var(--muted); cursor:pointer; transition:border-color .2s, background .2s, color .2s; }
+  #fb .scale button.on, #fb .choice button.on { border-color:var(--brand); background:var(--brand-soft); color:var(--brand); }
+  #fb .ends { display:flex; justify-content:space-between; font-size:12px; color:var(--faint); margin-top:6px; }
+  #fb details { margin-top:22px; border-top:1px solid var(--line); padding-top:4px; }
+  #fb summary { list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:12px 0 2px; font-size:14px; font-weight:600; color:var(--brand); }
+  #fb summary::-webkit-details-marker { display:none; }
+  #fb summary::after { content:"+"; font-size:20px; font-weight:500; transition:transform .25s var(--ease); }
+  #fb details[open] summary::after { transform:rotate(45deg); }
+  #fb summary small { font-weight:500; color:var(--faint); margin-left:6px; }
   #fb .actions { display:flex; gap:10px; margin-top:24px; }
   #fb .actions button { flex:1; height:48px; border-radius:12px; border:0; font-weight:600; font-size:15px; cursor:pointer; }
   #fb .send { background:var(--brand); color:#fff; }
@@ -178,7 +189,7 @@
       <p class="sub">Sua opinião ajuda a melhorar o Move Ijuí. Leva menos de 1 minuto.</p>
       <span class="screen-pill">Tela: <span id="fbScreen">Início</span></span>
 
-      <span class="lbl">No geral, a tela foi…</span>
+      <span class="lbl">No geral, a tela foi… <span>(tudo é opcional)</span></span>
       <div class="moods" id="fbMood">
         <button type="button" data-v="Fácil"><b>😀</b>Fácil</button>
         <button type="button" data-v="Ok"><b>😐</b>Ok</button>
@@ -196,6 +207,24 @@
 
       <label class="lbl" for="fbWho">Quem é você? <span>(opcional)</span></label>
       <input id="fbWho" placeholder="Ex.: estudante, usa ônibus todo dia">
+
+      <details id="fbMore">
+        <summary>Quer responder mais 3?<small>leva 30 segundos</small></summary>
+
+        <span class="lbl">Foi fácil fazer o que você queria nesta tela?</span>
+        <div class="scale" data-k="facilidade">
+          <button type="button">1</button><button type="button">2</button><button type="button">3</button><button type="button">4</button><button type="button">5</button>
+        </div>
+        <div class="ends"><span>Muito difícil</span><span>Muito fácil</span></div>
+
+        <span class="lbl">Você usaria o Move Ijuí no seu dia a dia?</span>
+        <div class="choice" data-k="usaria">
+          <button type="button">Sim</button><button type="button">Talvez</button><button type="button">Não</button>
+        </div>
+
+        <label class="lbl" for="fbLike">Do que você mais gostou?</label>
+        <input id="fbLike" placeholder="Ex.: ver o ônibus chegando no mapa">
+      </details>
 
       <div class="actions"><button type="button" class="cancel" data-fb-close>Cancelar</button><button type="submit" class="send" id="fbSend" disabled>Enviar feedback</button></div>
     </form>
@@ -310,22 +339,29 @@ addEventListener("keydown", e => {
 
 // ---------- Feedback ----------
 // Para receber as respostas numa planilha:
-// 1. Crie um Google Form com 5 perguntas de "Resposta curta"/"Parágrafo": Tela, Avaliação, Incômodos, Comentário, Perfil.
+// 1. Crie um Google Form com perguntas de "Resposta curta"/"Parágrafo", uma para cada campo abaixo
+//    (Tela, Avaliação, Incômodos, Comentário, Perfil, Facilidade, Usaria, Gostou), todas opcionais.
 // 2. No Form: ⋮ → "Gerar link pré-preenchido", preencha qualquer coisa e copie o link.
 //    Ele tem o formato .../forms/d/e/<ID>/viewform?entry.111=...&entry.222=...
 // 3. Cole o <ID> em "form" e os números de cada entry abaixo.
 // Enquanto "form" estiver vazio, os feedbacks ficam guardados neste navegador (localStorage "moveIjuiFeedback").
 const FEEDBACK = {
   form: "1FAIpQLSc0-VHR1B3pPmqh3Hh6-U_davP6iGakxe6huhWjp5rN8-G1gQ",
-  campos: { tela: "entry.1124515453", nota: "entry.1634539778", incomodos: "entry.1836309175", texto: "entry.1121071912", perfil: "entry.436568876" },
+  campos: { tela: "entry.1124515453", nota: "entry.1634539778", incomodos: "entry.1836309175", texto: "entry.1121071912", perfil: "entry.436568876",
+    facilidade: "entry.1412386406", usaria: "entry.366532021", gostou: "entry.417409780" },
 };
 const fb = document.getElementById("fb"), fbForm = document.getElementById("fbForm"), fbDone = document.getElementById("fbDone");
 const fbMood = document.getElementById("fbMood"), fbTags = document.getElementById("fbTags"), fbSend = document.getElementById("fbSend");
-let fbVal = { nota: "" };
+let fbVal = { nota: "", facilidade: "", usaria: "" };
+// tudo é opcional: o botão de enviar acende quando qualquer coisa foi respondida
+function fbCheck() {
+  const typed = ["fbText", "fbWho", "fbLike"].some(id => document.getElementById(id).value.trim());
+  fbSend.disabled = !(typed || fbVal.nota || fbVal.facilidade || fbVal.usaria || fbTags.querySelector(".on"));
+}
 function openFb() {
-  fbForm.reset(); fbVal = { nota: "" }; fbSend.disabled = true;
-  fbMood.querySelectorAll("button").forEach(b => b.classList.remove("on"));
-  fbTags.querySelectorAll("button").forEach(b => b.classList.remove("on"));
+  fbForm.reset(); fbVal = { nota: "", facilidade: "", usaria: "" }; fbSend.disabled = true;
+  document.getElementById("fbMore").open = false;
+  fbForm.querySelectorAll("button.on").forEach(b => b.classList.remove("on"));
   document.getElementById("fbScreen").textContent = S[cur] || "Início";
   fbForm.hidden = false; fbDone.hidden = true; fb.classList.add("show");
 }
@@ -336,15 +372,24 @@ addEventListener("keydown", e => { if (e.key === "Escape") closeFb(); });
 fbMood.onclick = e => {
   const b = e.target.closest("button"); if (!b) return;
   fbMood.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
-  fbVal.nota = b.dataset.v; fbSend.disabled = false;
+  fbVal.nota = b.dataset.v; fbCheck();
 };
-fbTags.onclick = e => { const b = e.target.closest("button"); if (b) b.classList.toggle("on"); };
+fbTags.onclick = e => { const b = e.target.closest("button"); if (b) { b.classList.toggle("on"); fbCheck(); } };
+// escala 1–5 e Sim/Talvez/Não: escolha única; tocar de novo desmarca
+fbForm.querySelectorAll("[data-k]").forEach(g => g.onclick = e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const on = !b.classList.contains("on");
+  g.querySelectorAll("button").forEach(x => x.classList.toggle("on", on && x === b));
+  fbVal[g.dataset.k] = on ? b.textContent : ""; fbCheck();
+});
+fbForm.addEventListener("input", fbCheck);
 fbForm.onsubmit = async e => {
   e.preventDefault();
   const data = {
     tela: `${cur} · ${S[cur] || ""}`, nota: fbVal.nota,
     incomodos: [...fbTags.querySelectorAll(".on")].map(b => b.textContent).join(", "),
     texto: document.getElementById("fbText").value.trim(), perfil: document.getElementById("fbWho").value.trim(),
+    facilidade: fbVal.facilidade, usaria: fbVal.usaria, gostou: document.getElementById("fbLike").value.trim(),
   };
   fbSend.disabled = true; fbSend.textContent = "Enviando…";
   try {
