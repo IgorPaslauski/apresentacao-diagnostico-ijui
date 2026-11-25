@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Move Ijuí</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#F8F9FF">
+<meta name="theme-color" content="#FFFFFF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
@@ -25,48 +25,47 @@
 <!-- ======================================================= 01 · INÍCIO -->
 <section class="screen" id="s01" data-header="home" data-tabs="bus" data-tab="s01">
   <main class="content">
-    <h1 class="h-title row gap-8" style="font-size:26px;line-height:32px">Bom dia, Mariana <img src="assets/emoji-aceno.png" alt="" width="26" height="26"></h1>
-    <p class="t-apoio muted" style="margin:4px 0 0">Saindo da Praça da República</p>
+    <!-- Abertura útil: a próxima saída que importa, não uma saudação -->
+    <button class="home-next" data-go="s04">
+      <span class="eyebrow">Bom dia, Mariana</span>
+      <span class="home-hl">O <b class="line-tag">03</b> pro campus passa em <em>4 min</em></span>
+      <span class="small muted row gap-4"><span class="ms" style="font-size:16px">location_on</span>Praça da República, a 85 m</span>
+    </button>
 
-    <!-- Busca com "quando" embutido (padrão Uber: "Para onde?" + "Agora") -->
-    <div class="search mt-24">
+    <!-- Ação principal: o destino vem primeiro; o app compara ônibus e carro na tela de Rotas -->
+    <div class="search primary mt-24">
       <button class="grow row gap-12" data-go="s02" style="height:100%;text-align:left;color:inherit"><span class="ms">search</span>Para onde você vai?</button>
       <button class="when-pill" data-go="s09" data-when="Agendar"><span class="ms">schedule</span>Agora<span class="ms">expand_more</span></button>
     </div>
 
-    <!-- Serviços em ícones (padrão 99 / Rota 77) -->
-    <div class="services mt-20">
+    <!-- Atalhos para quem já sabe o meio de transporte -->
+    <div class="services shortcuts mt-16">
       <button data-go="s02"><span class="sv"><span class="ms">directions_bus</span></span>Ônibus</button>
       <button data-go="s09" data-when="Agora"><span class="sv"><span class="ms">directions_car</span></span>Carro</button>
       <button data-go="s09" data-when="Agendar"><span class="sv"><span class="ms">event</span></span>Agendar</button>
       <button data-go="s04"><span class="sv"><span class="ms">location_on</span></span>Pontos</button>
     </div>
 
-    <!-- Destinos recentes em lista (padrão Uber) -->
-    <div class="card list mt-20">
-      <button class="item" data-go="s02" data-dest="Campus UNIJUÍ|Campus UNIJUÍ • Portão 01"><span class="icon-sq round"><span class="ms">school</span></span><div class="grow"><div class="sb">Campus UNIJUÍ</div><div class="small muted">Portão 01 • 22 min de ônibus</div></div><span class="ms chev">chevron_right</span></button>
-      <button class="item" data-go="s02" data-dest="Casa|Casa • Rua 19 de Outubro, 420"><span class="icon-sq round"><span class="ms">home</span></span><div class="grow"><div class="sb">Casa</div><div class="small muted">Rua 19 de Outubro, 420 • 12 min a pé</div></div><span class="ms chev">chevron_right</span></button>
-      <button class="item" data-go="s02" data-dest="HCI|HCI • Hospital de Caridade"><span class="icon-sq round"><span class="ms">history</span></span><div class="grow"><div class="sb">HCI</div><div class="small muted">Hospital de Caridade • 11 min</div></div><span class="ms chev">chevron_right</span></button>
+    <!-- Destinos recentes: lista solta, sem caixa -->
+    <div class="sec"><h2>Recentes</h2></div>
+    <div class="list plain">
+      <button class="item" data-go="s02" data-dest="Campus UNIJUÍ|Campus UNIJUÍ • Portão 01"><span class="icon-sq round"><span class="ms">school</span></span><div class="grow"><div class="sb">Campus UNIJUÍ</div><div class="small muted modes"><span><span class="ms">directions_bus</span>22 min</span><span><span class="ms">directions_car</span>9 min</span></div></div><span class="ms chev">chevron_right</span></button>
+      <button class="item" data-go="s02" data-dest="Casa|Casa • Rua 19 de Outubro, 420"><span class="icon-sq round"><span class="ms">home</span></span><div class="grow"><div class="sb">Casa</div><div class="small muted modes"><span><span class="ms">directions_walk</span>12 min</span><span><span class="ms">directions_car</span>4 min</span></div></div><span class="ms chev">chevron_right</span></button>
+      <button class="item" data-go="s02" data-dest="HCI|HCI • Hospital de Caridade"><span class="icon-sq round"><span class="ms">history</span></span><div class="grow"><div class="sb">HCI</div><div class="small muted modes"><span><span class="ms">directions_bus</span>11 min</span><span><span class="ms">directions_car</span>6 min</span></div></div><span class="ms chev">chevron_right</span></button>
     </div>
 
-    <!-- Pila Verde: saldo e desafio sempre à vista -->
+    <!-- Favos: saldo e desafio sempre à vista -->
     <button class="card pila-mini mt-20" data-go="s20">
-      <span class="pila-coin">P</span>
-      <div class="grow"><div class="sb"><span data-pila>38</span> Pila Verde</div><div class="small muted">Desafio: 3 de 5 viagens de ônibus</div></div>
+      <span class="pila-coin" aria-hidden="true"></span>
+      <div class="grow"><div class="sb"><span data-pila>38</span> favos</div><div class="small muted">Desafio: 3 de 5 viagens de ônibus</div></div>
       <span class="ms chev muted">chevron_right</span>
     </button>
 
-    <div class="sec"><h2>Perto de você</h2><button data-go="s04">Ver pontos</button></div>
-    <button class="card opt" data-go="s04">
-      <span class="icon-sq lg brand" style="font-size:17px;font-weight:700">03</span>
-      <div class="main"><div class="t">Campus UNIJUÍ</div><div class="s">Praça da República • 85 m</div></div>
-      <div class="end"><div class="big green">4<small>min</small></div></div>
-    </button>
-
-    <button class="card row mt-16" data-go="s14" style="width:100%;text-align:left;box-shadow:none;background:var(--neutral-soft);border-color:transparent">
-      <span class="ms green">campaign</span>
-      <div class="grow small">Linha 03 com reforço até o campus: ônibus a cada 10 min.</div>
-      <span class="ms chev muted">chevron_right</span>
+    <!-- Aviso como faixa simples, sem caixa -->
+    <button class="notice-line mt-20" data-go="s14">
+      <span class="ms">campaign</span>
+      <span class="grow">Linha 03 com reforço até o campus: ônibus a cada 10 min.</span>
+      <span class="ms chev">chevron_right</span>
     </button>
   </main>
 </section>
@@ -102,7 +101,7 @@
         <div class="end"><div class="big">9<small>min</small></div><div class="s">R$ 14,50</div></div>
       </button>
       <div style="height:1px;background:#EEF1F5;margin:0 20px"></div>
-      <button class="opt" data-action="toast" data-msg="Bicicletas: em breve no Move Ijuí" style="padding:20px">
+      <button class="opt" data-go="s21" style="padding:20px">
         <span class="icon-sq lg"><span class="ms">pedal_bike</span></span>
         <div class="main"><div class="t">Bicicleta</div><div class="s">Chega 08:07 • ciclofaixa</div></div>
         <div class="end"><div class="big">22<small>min</small></div><div class="s">R$ 2,00</div></div>
@@ -227,7 +226,7 @@
       </div>
       <div class="safety mt-16">
         <button data-action="toast" data-msg="Link do trajeto copiado"><span class="ms">share_location</span>Compartilhar</button>
-        <button data-action="toast" data-msg="Central de Segurança: em breve"><span class="ms">shield</span>Segurança</button>
+        <button data-go="s22"><span class="ms">shield</span>Segurança</button>
         <button class="sos" data-action="toast" data-msg="Ligando para 190…"><span class="ms">sos</span>Emergência</button>
       </div>
     </div>
@@ -249,7 +248,7 @@
       <div class="item"><span class="grow green">Desconto acadêmico</span><span class="green">− R$ 2,00</span></div>
       <div class="item"><span class="grow b">Total pago</span><span class="h-sec" data-s="price">R$ 14,50</span></div>
     </div>
-    <p class="small muted mt-12 row gap-6"><span class="ms" style="font-size:16px">credit_card</span>Cartão Move Estudante • saldo R$ 24,00</p>
+    <p class="small muted mt-12 row gap-6"><span class="ms" style="font-size:16px">credit_card</span><span data-s="pay">Cartão Move Estudante</span></p>
 
     <div class="card mt-24" style="text-align:center">
       <img class="avatar" src="assets/motorista-encontrado.jpg" alt="" style="width:56px;height:56px;border:0;margin:0 auto">
@@ -294,8 +293,8 @@
 
     <!-- Recompensa da viagem sustentável -->
     <button class="card pila-mini earned mt-20" data-go="s20">
-      <span class="pila-coin">P</span>
-      <div class="grow"><div class="sb">+3 Pila Verde</div><div class="small muted">Desafio da semana: 4 de 5 viagens</div></div>
+      <span class="pila-coin" aria-hidden="true"></span>
+      <div class="grow"><div class="sb">+3 favos</div><div class="small muted">Desafio da semana: 4 de 5 viagens</div></div>
       <span class="small b green">Ver</span>
     </button>
 
@@ -388,7 +387,7 @@
   <div class="cta-bar">
     <!-- Pagamento e cupom logo acima do botão, como nos apps de corrida -->
     <div class="pay-row">
-      <button class="pay" data-action="toast" data-msg="Trocar pagamento: em breve"><span class="ms green">credit_card</span><span class="grow ellipsis">Cartão Move Estudante</span><span class="ms muted">expand_more</span></button>
+      <button class="pay" data-go="s23"><span class="ms green">credit_card</span><span class="grow ellipsis" data-s="pay">Cartão Move Estudante</span><span class="ms muted">expand_more</span></button>
       <button class="pay coupon" data-action="toast" data-msg="Cupom VOLTAASAULAS aplicado: 10% até o campus"><span class="ms green">confirmation_number</span>Cupom</button>
     </div>
     <button class="btn primary" data-action="confirm-car"><span data-pick-label>Confirmar Move Pop • R$ 14,50</span></button>
@@ -468,7 +467,7 @@
       <!-- Atalhos de segurança (Uber: "Segurança"; 99: "Botão de emergência") -->
       <div class="safety mt-16">
         <button data-action="toast" data-msg="Link do trajeto copiado"><span class="ms">share_location</span>Compartilhar</button>
-        <button data-action="toast" data-msg="Central de Segurança: em breve"><span class="ms">shield</span>Segurança</button>
+        <button data-go="s22"><span class="ms">shield</span>Segurança</button>
         <button class="sos" data-action="toast" data-msg="Ligando para 190…"><span class="ms">sos</span>Emergência</button>
       </div>
 
@@ -529,12 +528,12 @@
 
     <div class="stats mt-20">
       <div><div class="v">24</div><div class="l">Viagens no mês</div></div>
-      <button data-go="s20"><div class="v green"><span data-pila>38</span></div><div class="l">Pila Verde</div></button>
+      <button data-go="s20"><div class="v green"><span data-pila>38</span></div><div class="l">Favos</div></button>
       <div><div class="v green">+18%</div><div class="l">Sustentáveis</div></div>
     </div>
 
-    <div class="sec"><h2>Locais salvos</h2><button data-action="toast" data-msg="Adicionar local: em breve">Adicionar</button></div>
-    <div class="card list">
+    <div class="sec"><h2>Locais salvos</h2><button data-go="s24">Adicionar</button></div>
+    <div class="card list" data-places>
       <button class="item" data-go="s02"><span class="icon-sq"><span class="ms">school</span></span><div class="grow"><div class="sb">Campus UNIJUÍ</div><div class="small muted">Linhas 03 e 08</div></div><span class="ms chev">chevron_right</span></button>
       <button class="item" data-go="s02"><span class="icon-sq"><span class="ms">home</span></span><div class="grow"><div class="sb">Casa</div><div class="small muted">Rua 19 de Outubro, 420</div></div><span class="ms chev">chevron_right</span></button>
       <button class="item" data-go="s02"><span class="icon-sq"><span class="ms">local_hospital</span></span><div class="grow"><div class="sb">Hospital HCI</div><div class="small muted">Linha 01</div></div><span class="ms chev">chevron_right</span></button>
@@ -550,8 +549,8 @@
     <div class="card list">
       <button class="item" data-go="s16"><span class="icon-sq"><span class="ms">local_taxi</span></span><div class="grow"><div class="sb">Modo motorista</div><div class="small muted">Dirija pela cooperativa</div></div><span class="ms chev">chevron_right</span></button>
       <button class="item" data-action="theme"><span class="icon-sq"><span class="ms">dark_mode</span></span><div class="grow"><div class="sb">Aparência</div><div class="small muted" data-s="theme">Automático</div></div><span class="ms chev">chevron_right</span></button>
-      <button class="item" data-action="toast" data-msg="Pagamentos: em breve"><span class="icon-sq"><span class="ms">credit_card</span></span><div class="grow"><div class="sb">Pagamentos</div><div class="small muted">Cartão Move Estudante</div></div><span class="ms chev">chevron_right</span></button>
-      <button class="item" data-action="toast" data-msg="Ajuda: em breve"><span class="icon-sq"><span class="ms">help</span></span><div class="grow"><div class="sb">Ajuda</div></div><span class="ms chev">chevron_right</span></button>
+      <button class="item" data-go="s23"><span class="icon-sq"><span class="ms">credit_card</span></span><div class="grow"><div class="sb">Pagamentos</div><div class="small muted" data-s="pay">Cartão Move Estudante</div></div><span class="ms chev">chevron_right</span></button>
+      <button class="item" data-go="s25"><span class="icon-sq"><span class="ms">help</span></span><div class="grow"><div class="sb">Ajuda</div></div><span class="ms chev">chevron_right</span></button>
     </div>
   </main>
 </section>
@@ -661,22 +660,22 @@
   </div>
 </section>
 
-<!-- ======================================================= 20 · PILA VERDE (gamificação)
-     Inspirado no Pila Verde de Santiago (RS): moeda verde que premia práticas sustentáveis.
-     Aqui: quem anda de ônibus, bicicleta, a pé ou divide a corrida ganha pilas e troca por passagem,
+<!-- ======================================================= 20 · FAVOS (gamificação)
+     Nome vem de Ijuí, a "Colmeia do Trabalho": cada favo é uma viagem sustentável, e juntos enchem a colmeia da cidade.
+     Aqui: quem anda de ônibus, bicicleta, a pé ou divide a corrida ganha favos e troca por passagem,
      desconto no comércio local ou uma muda plantada na cidade. Meta coletiva > ranking individual. -->
-<section class="screen" id="s20" data-header="back" data-title="Pila Verde" data-back="s01">
+<section class="screen" id="s20" data-header="back" data-title="Favos" data-back="s01">
   <main class="content">
     <!-- Saldo + nível -->
     <div class="card pila-hero">
       <div class="row between top">
         <div>
           <div class="small" style="color:#ffffffb3">Seu saldo</div>
-          <div class="pila-bal"><span class="pila-coin">P</span><span data-pila>38</span><small>pilas</small></div>
+          <div class="pila-bal"><span class="pila-coin" aria-hidden="true"></span><span data-pila>38</span><small>favos</small></div>
         </div>
         <span class="lvl"><span class="ms fill">eco</span>Muda</span>
       </div>
-      <div class="small mt-16" style="color:#ffffffcc">Faltam <b data-pila-next>12</b> pilas para virar <b>Árvore</b></div>
+      <div class="small mt-16" style="color:#ffffffcc">Faltam <b data-pila-next>12</b> favos para virar <b>Árvore</b></div>
       <div class="progress mt-8" style="background:#ffffff33"><i data-pila-bar style="width:76%;background:#A5F4C0"></i></div>
       <div class="lvl-steps mt-8"><span class="done">Broto</span><span class="done">Muda</span><span>Árvore</span><span>Bosque</span></div>
     </div>
@@ -688,7 +687,7 @@
       <div class="grow">
         <div class="sb">Vá 5 vezes de ônibus ao campus</div>
         <div class="progress mt-8"><i style="width:60%"></i></div>
-        <div class="small muted mt-4">3 de 5 • prêmio de <b class="green">+10 pilas</b></div>
+        <div class="small muted mt-4">3 de 5 • prêmio de <b class="green">+10 favos</b></div>
       </div>
     </div>
 
@@ -702,19 +701,149 @@
     </div>
 
     <!-- Trocar -->
-    <div class="sec"><h2>Trocar pilas</h2></div>
+    <div class="sec"><h2>Trocar favos</h2></div>
     <div class="redeem">
-      <button data-action="redeem" data-cost="20" data-msg="Passagem de ônibus adicionada ao cartão"><span class="icon-sq lg"><span class="ms">confirmation_number</span></span><div class="t">Passagem de ônibus</div><div class="cost">20 pilas</div></button>
-      <button data-action="redeem" data-cost="15" data-msg="Cupom de R$ 3 no Move Pop ativado"><span class="icon-sq lg"><span class="ms">directions_car</span></span><div class="t">R$ 3 no Move Pop</div><div class="cost">15 pilas</div></button>
-      <button data-action="redeem" data-cost="25" data-msg="Cupom de 10% na Feira do Produtor gerado"><span class="icon-sq lg"><span class="ms">storefront</span></span><div class="t">10% na Feira do Produtor</div><div class="cost">25 pilas</div></button>
-      <button data-action="redeem" data-cost="30" data-msg="Uma muda será plantada no seu nome 🌱"><span class="icon-sq lg"><span class="ms">park</span></span><div class="t">Plantar uma árvore</div><div class="cost">30 pilas</div></button>
+      <button data-action="redeem" data-cost="20" data-msg="Passagem de ônibus adicionada ao cartão"><span class="icon-sq lg"><span class="ms">confirmation_number</span></span><div class="t">Passagem de ônibus</div><div class="cost">20 favos</div></button>
+      <button data-action="redeem" data-cost="15" data-msg="Cupom de R$ 3 no Move Pop ativado"><span class="icon-sq lg"><span class="ms">directions_car</span></span><div class="t">R$ 3 no Move Pop</div><div class="cost">15 favos</div></button>
+      <button data-action="redeem" data-cost="25" data-msg="Cupom de 10% na Feira do Produtor gerado"><span class="icon-sq lg"><span class="ms">storefront</span></span><div class="t">10% na Feira do Produtor</div><div class="cost">25 favos</div></button>
+      <button data-action="redeem" data-cost="30" data-msg="Uma muda será plantada no seu nome 🌱"><span class="icon-sq lg"><span class="ms">park</span></span><div class="t">Plantar uma árvore</div><div class="cost">30 favos</div></button>
     </div>
 
     <!-- Meta coletiva -->
     <div class="card mt-24" style="background:var(--brand-soft);border-color:transparent;box-shadow:none">
       <div class="row gap-8"><span class="ms green">forest</span><div class="sb">Meta de Ijuí: 1.000 árvores em 2026</div></div>
       <div class="progress mt-12" style="background:#ffffff99"><i style="width:64%"></i></div>
-      <div class="small muted mt-8">642 plantadas com pilas trocadas • 12 t de CO₂ evitadas no mês</div>
+      <div class="small muted mt-8">642 plantadas com favos trocadas • 12 t de CO₂ evitadas no mês</div>
+    </div>
+  </main>
+</section>
+
+<!-- ======================================================= 21 · BICICLETA -->
+<section class="screen" id="s21" data-header="back" data-title="Bicicleta" data-back="s02">
+  <main class="content">
+    <p class="lead">Pegue uma bike na estação e devolva perto do destino.</p>
+    <div class="card" style="padding:16px 20px">
+      <div class="route">
+        <div class="stop"><div class="tiny muted">Retirar</div><div class="t-apoio sb">Estação Praça da República</div></div>
+        <div class="stop dest"><div class="tiny muted">Devolver</div><div class="t-apoio sb">Estação <span data-s="dest">Campus UNIJUÍ</span></div></div>
+      </div>
+    </div>
+
+    <div class="stats mt-20">
+      <div><div class="v">22 min</div><div class="l">Pedalando</div></div>
+      <div><div class="v">R$ 2,00</div><div class="l">Até 30 min</div></div>
+      <div><div class="v green">+4</div><div class="l">Favos</div></div>
+    </div>
+
+    <div class="sec"><h2>Estação mais próxima</h2><span class="small muted">a 90 m</span></div>
+    <div class="card list">
+      <div class="item"><span class="icon-sq"><span class="ms">pedal_bike</span></span><div class="grow"><div class="sb">6 bikes livres</div><div class="small muted">Praça da República • aberta 24 h</div></div></div>
+      <div class="item"><span class="icon-sq"><span class="ms">local_parking</span></span><div class="grow"><div class="sb">9 vagas para devolver</div><div class="small muted">Estação do campus, Portão 01</div></div></div>
+      <div class="item"><span class="icon-sq"><span class="ms">route</span></span><div class="grow"><div class="sb">80% do trajeto em ciclofaixa</div><div class="small muted">Pela Av. David José Martins</div></div></div>
+    </div>
+    <p class="small muted mt-16 row gap-6"><span class="ms" style="font-size:16px">info</span>Use capacete e devolva a bike travada na estação.</p>
+  </main>
+  <div class="cta-bar"><button class="btn primary" data-go="s01" data-reset data-msg="Bike 214 desbloqueada. Boa pedalada!"><span class="ms">lock_open</span>Desbloquear bike</button></div>
+</section>
+
+<!-- ======================================================= 22 · CENTRAL DE SEGURANÇA -->
+<section class="screen" id="s22" data-header="back" data-title="Segurança" data-back="s12">
+  <main class="content">
+    <p class="lead">Ferramentas para você viajar tranquila.</p>
+    <div class="card row" style="background:var(--brand-soft);border-color:transparent;box-shadow:none">
+      <span class="ms green">verified_user</span>
+      <div class="grow"><div class="sb">Viagem monitorada</div><div class="small muted">Avisamos se o carro parar ou sair da rota</div></div>
+    </div>
+
+    <div class="sec"><h2>Durante a viagem</h2></div>
+    <div class="card list">
+      <button class="item" data-action="toast" data-msg="Trajeto enviado para Mãe e Júlia"><span class="icon-sq"><span class="ms">share_location</span></span><div class="grow"><div class="sb">Compartilhar trajeto</div><div class="small muted">Contatos veem o carro ao vivo</div></div><span class="ms chev">chevron_right</span></button>
+      <div class="item"><span class="icon-sq"><span class="ms">notifications_active</span></span><div class="grow"><div class="sb">Avisar se sair da rota</div><div class="small muted">Pergunta se está tudo bem</div></div><button class="toggle on" data-action="toggle" aria-label="Avisar se sair da rota"></button></div>
+      <div class="item"><span class="icon-sq"><span class="ms">mic</span></span><div class="grow"><div class="sb">Gravar áudio da corrida</div><div class="small muted">Fica protegido, só o suporte ouve</div></div><button class="toggle" data-action="toggle" aria-label="Gravar áudio da corrida"></button></div>
+    </div>
+
+    <div class="sec"><h2>Contatos de confiança</h2><button data-action="toast" data-msg="Contato adicionado">Adicionar</button></div>
+    <div class="card list">
+      <div class="item"><span class="icon-sq round"><span class="ms">person</span></span><div class="grow"><div class="sb">Mãe</div><div class="small muted">(55) 9 9812-•••• • recebe todas as viagens</div></div></div>
+      <div class="item"><span class="icon-sq round"><span class="ms">person</span></span><div class="grow"><div class="sb">Júlia</div><div class="small muted">(55) 9 9703-•••• • só à noite</div></div></div>
+    </div>
+
+    <div class="sec"><h2>Precisa de ajuda?</h2></div>
+    <div class="card list">
+      <button class="item" data-action="toast" data-msg="Ligando para 190…"><span class="icon-sq err"><span class="ms">sos</span></span><div class="grow"><div class="sb" style="color:var(--err)">Ligar para a polícia (190)</div><div class="small muted">Sua localização vai junto</div></div></button>
+      <button class="item" data-go="s25"><span class="icon-sq"><span class="ms">support_agent</span></span><div class="grow"><div class="sb">Falar com o suporte</div><div class="small muted">Atendimento 24 h</div></div><span class="ms chev">chevron_right</span></button>
+    </div>
+  </main>
+</section>
+
+<!-- ======================================================= 23 · PAGAMENTOS -->
+<section class="screen" id="s23" data-header="back" data-title="Pagamentos" data-back="s15">
+  <main class="content">
+    <div class="card" style="background:var(--brand-soft);border-color:transparent;box-shadow:none">
+      <div class="small muted">Saldo do Cartão Move Estudante</div>
+      <div style="font-size:30px;line-height:38px;font-weight:800" class="mt-4">R$ <span data-saldo>24,00</span></div>
+      <div class="small muted">Meia passagem • válido até 12/2026</div>
+      <button class="btn sm primary mt-16" style="width:auto;padding:0 16px" data-action="topup"><span class="ms">add</span>Recarregar R$ 20</button>
+    </div>
+
+    <div class="sec"><h2>Forma de pagamento</h2></div>
+    <div class="card list" data-pay>
+      <button class="item" data-name="Cartão Move Estudante"><span class="icon-sq"><span class="ms">credit_card</span></span><div class="grow"><div class="sb">Cartão Move Estudante</div><div class="small muted">Desconto acadêmico em carro e ônibus</div></div><span class="ms pay-check">check_circle</span></button>
+      <button class="item" data-name="Pix"><span class="icon-sq"><span class="ms">qr_code_2</span></span><div class="grow"><div class="sb">Pix</div><div class="small muted">Paga no fim da corrida</div></div><span class="ms pay-check">check_circle</span></button>
+      <button class="item" data-name="Cartão de crédito •• 4821"><span class="icon-sq"><span class="ms">credit_score</span></span><div class="grow"><div class="sb">Cartão de crédito •• 4821</div><div class="small muted">Visa</div></div><span class="ms pay-check">check_circle</span></button>
+      <button class="item" data-name="Dinheiro"><span class="icon-sq"><span class="ms">payments</span></span><div class="grow"><div class="sb">Dinheiro</div><div class="small muted">Só para carro</div></div><span class="ms pay-check">check_circle</span></button>
+    </div>
+    <button class="link-btn mt-12" data-action="toast" data-msg="Cartão adicionado"><span class="ms">add</span>Adicionar cartão</button>
+
+    <div class="sec"><h2>Últimos gastos</h2></div>
+    <div class="card list">
+      <div class="item"><span class="icon-sq"><span class="ms">directions_bus</span></span><div class="grow"><div class="sb">Linha 03</div><div class="small muted">Hoje, 07:52</div></div><span>R$ 4,50</span></div>
+      <div class="item"><span class="icon-sq"><span class="ms">directions_car</span></span><div class="grow"><div class="sb">Move Pop</div><div class="small muted">Ontem, 18:20</div></div><span>R$ 14,50</span></div>
+    </div>
+  </main>
+</section>
+
+<!-- ======================================================= 24 · ADICIONAR LOCAL -->
+<section class="screen" id="s24" data-header="back" data-title="Adicionar local" data-back="s15">
+  <main class="content">
+    <p class="lead">Salve um lugar para chegar lá com um toque.</p>
+    <div class="small muted">Tipo</div>
+    <div class="scroller mt-8 seg" data-seg data-place-type>
+      <button class="chip lg on" data-icon="work"><span class="ms">work</span>Trabalho</button>
+      <button class="chip lg" data-icon="fitness_center"><span class="ms">fitness_center</span>Academia</button>
+      <button class="chip lg" data-icon="shopping_cart"><span class="ms">shopping_cart</span>Mercado</button>
+      <button class="chip lg" data-icon="star"><span class="ms">star</span>Outro</button>
+    </div>
+    <label class="small muted mt-20" style="display:block" for="place-name">Nome</label>
+    <input class="input field mt-8" id="place-name" placeholder="Ex.: Estágio" value="Estágio">
+    <label class="small muted mt-16" style="display:block" for="place-addr">Endereço</label>
+    <input class="input field mt-8" id="place-addr" placeholder="Rua, número ou ponto de referência" value="Rua do Comércio, 1200">
+    <div class="small muted mt-20">Sugestões perto de você</div>
+    <div class="card list mt-8">
+      <button class="item" data-fill="Prefeitura de Ijuí|Rua Benjamin Constant, 429"><span class="icon-sq"><span class="ms">location_on</span></span><div class="grow"><div class="sb">Prefeitura de Ijuí</div><div class="small muted">Rua Benjamin Constant, 429</div></div></button>
+      <button class="item" data-fill="Rodoviária|Av. 21 de Abril, 300"><span class="icon-sq"><span class="ms">location_on</span></span><div class="grow"><div class="sb">Rodoviária</div><div class="small muted">Av. 21 de Abril, 300</div></div></button>
+    </div>
+  </main>
+  <div class="cta-bar"><button class="btn primary" data-action="add-place">Salvar local</button></div>
+</section>
+
+<!-- ======================================================= 25 · AJUDA -->
+<section class="screen" id="s25" data-header="back" data-title="Ajuda" data-back="s15">
+  <main class="content">
+    <p class="lead">Como podemos ajudar?</p>
+    <div class="sec"><h2>Perguntas frequentes</h2></div>
+    <div class="card list faq">
+      <div class="item faq-q"><button data-action="faq"><span class="grow sb">Como funciona a meia passagem?</span><span class="ms chev">expand_more</span></button><p class="small muted">Com o Cartão Move Estudante você paga metade no ônibus e tem R$ 2 de desconto no carro. Basta ter matrícula ativa.</p></div>
+      <div class="item faq-q"><button data-action="faq"><span class="grow sb">Esqueci um objeto no carro</span><span class="ms chev">expand_more</span></button><p class="small muted">Abra a corrida em Perfil e toque em “Falar com o motorista”. Se ele não responder em 24 h, o suporte ajuda.</p></div>
+      <div class="item faq-q"><button data-action="faq"><span class="grow sb">Fui cobrada errado</span><span class="ms chev">expand_more</span></button><p class="small muted">Fale com a gente pelo chat. Cobranças erradas voltam para o cartão em até 2 dias úteis.</p></div>
+      <div class="item faq-q"><button data-action="faq"><span class="grow sb">Como ganho favos?</span><span class="ms chev">expand_more</span></button><p class="small muted">Indo de ônibus, bike, a pé ou dividindo a corrida. Veja tudo na tela Favos.</p></div>
+    </div>
+
+    <div class="sec"><h2>Falar com a gente</h2></div>
+    <div class="card list">
+      <button class="item" data-action="toast" data-msg="Abrindo chat com o suporte"><span class="icon-sq"><span class="ms">chat</span></span><div class="grow"><div class="sb">Chat</div><div class="small muted">Responde em ~3 min</div></div><span class="ms chev">chevron_right</span></button>
+      <button class="item" data-action="toast" data-msg="Ligando para 0800 555 0055…"><span class="icon-sq"><span class="ms">call</span></span><div class="grow"><div class="sb">0800 555 0055</div><div class="small muted">Todos os dias, 24 h</div></div><span class="ms chev">chevron_right</span></button>
+      <button class="item" data-action="toast" data-msg="Problema enviado à Central de Trânsito"><span class="icon-sq"><span class="ms">report</span></span><div class="grow"><div class="sb">Reportar problema na linha</div><div class="small muted">Vai direto para a Central de Trânsito</div></div><span class="ms chev">chevron_right</span></button>
     </div>
   </main>
 </section>

@@ -52,7 +52,7 @@ img { display: block; }
 
 /* ---------- Barra de status + cabeçalho ---------- */
 .appbar { position: absolute; top: 0; left: 0; right: 0; z-index: 5; height: 88px;
-  background: rgba(248, 249, 255, .9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  background: rgba(255, 255, 255, .9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 .statusbar { height: 24px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 16px;
   font-size: 12px; font-weight: 600; }
 .statusbar .icons { display: flex; align-items: center; gap: 4px; font-size: 10px; }
@@ -71,7 +71,7 @@ img { display: block; }
 
 /* ---------- Barra inferior ---------- */
 .tabbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; height: 80px; display: flex;
-  background: rgba(248, 249, 255, .92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, .92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid rgba(191, 201, 191, .35); padding-bottom: 14px; }
 .tabbar button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
   font-size: 12px; font-weight: 600; color: var(--ink-3); position: relative; }
@@ -179,7 +179,7 @@ img { display: block; }
 .map { position: relative; overflow: hidden; background: #dff3e8 center / cover no-repeat; }
 .map > img.bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .map svg.route-line { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.map .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 40%; background: linear-gradient(to bottom, transparent, rgba(248, 249, 255, .95)); pointer-events: none; }
+.map .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 40%; background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, .95)); pointer-events: none; }
 .pin { position: absolute; transform: translate(-50%, -50%); display: grid; place-items: center; }
 .pin .bubble { width: 30px; height: 30px; border-radius: 50%; background: #fff; display: grid; place-items: center; box-shadow: 0 2px 6px rgba(11, 28, 48, .25); color: var(--brand); }
 .pin .bubble .ms { font-size: 17px; }
@@ -304,7 +304,7 @@ textarea.input { width: 100%; min-height: 84px; border: 0; border-radius: 12px; 
    ===================================================================== */
 /* Ação principal fixa no rodapé */
 .cta-bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; padding: 16px 20px 28px;
-  background: linear-gradient(to bottom, rgba(248, 249, 255, 0), var(--bg) 28%); display: flex; flex-direction: column; gap: 10px; }
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--bg) 28%); display: flex; flex-direction: column; gap: 10px; }
 .cta-bar .row { gap: 10px; }
 .screen.has-cta .content { padding-bottom: 128px; }
 .link-btn { font-size: 15px; font-weight: 600; color: var(--ink-2); align-self: center; padding: 10px 12px; min-height: 44px; }
@@ -443,11 +443,11 @@ body.is-offline [data-go="s09"], body.is-offline [data-go="s10"], body.is-offlin
    Mapas reais (Leaflet)
    ===================================================================== */
 .map .leaf { position: absolute; inset: 0; z-index: 0; background: #E8EEF0; font: inherit; }
-.dark .map .leaf { background: #13283D; }
+.dark .map .leaf { background: #161A18; }
 .leaf .mi { background: none; border: 0; }
 .leaf .leaflet-control-attribution { font-size: 9px; line-height: 12px; padding: 1px 5px; background: rgba(255, 255, 255, .7); color: #5b6b7c; }
 .leaf .leaflet-control-attribution a { color: inherit; }
-.dark .leaf .leaflet-control-attribution { background: rgba(11, 28, 48, .7); color: #9AA59C; }
+.dark .leaf .leaflet-control-attribution { background: rgba(12, 15, 14, .7); color: #9AA59C; }
 .content.flush .leaf .leaflet-bottom { bottom: 26px; }
 .bubble.line-no { font-size: 11px; font-weight: 800; color: var(--brand); width: 30px; height: 30px; }
 .bubble.dest-dot { width: 16px !important; height: 16px !important; background: #fff !important; box-shadow: 0 0 0 4px var(--brand-fill, #00522F), 0 2px 6px rgba(0, 0, 0, .3) !important; }
@@ -473,6 +473,44 @@ body.is-offline [data-go="s09"], body.is-offline [data-go="s10"], body.is-offlin
   transition: transform .15s var(--ease); }
 .services .sv .ms { font-size: 28px; }
 .services button:active .sv { transform: scale(.94); }
+
+/* Início: a busca é a ação principal; os serviços viram atalhos */
+.search.primary { height: 68px; border: 0; background: var(--brand-fill, var(--brand)); color: var(--on-brand-fill, #fff); font-size: 17px; font-weight: 600;
+  box-shadow: 0 10px 24px -12px rgba(0, 82, 47, .7); }
+.search.primary .ms { color: inherit; font-size: 24px; }
+.search.primary .when-pill { background: rgba(255, 255, 255, .16); color: inherit; }
+.search.primary .when-pill .ms { color: inherit; font-size: 18px; }
+.search.primary > button:first-child:active { opacity: .85; }
+.services.shortcuts { gap: 8px; }
+.services.shortcuts button { gap: 6px; font-size: 12px; color: var(--ink-3); }
+.services.shortcuts .sv { aspect-ratio: auto; height: 52px; border-radius: 14px; background: var(--card); border: 1px solid #E3E8EF; color: var(--ink-2); }
+.services.shortcuts .sv .ms { font-size: 24px; }
+.dark .services.shortcuts .sv { border-color: var(--line-soft); }
+.dark .search.primary { box-shadow: none; }
+.dark .search.primary .when-pill { background: rgba(0, 0, 0, .08); }
+/* Escuro: o saldo do Pila fica numa superfície escura, não no botão branco */
+.dark .pila-hero { background: var(--soft); border: 1px solid var(--line-soft); }
+.modes { display: inline-flex; align-items: center; gap: 10px; }
+.modes span { display: inline-flex; align-items: center; gap: 3px; }
+.modes .ms { font-size: 15px; }
+
+/* Início: abertura com a próxima saída em vez de saudação */
+.home-next { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; width: 100%; text-align: left; color: inherit; }
+.home-next .eyebrow { font-size: 14px; font-weight: 600; color: var(--ink-3); }
+.home-hl { font-size: 28px; line-height: 34px; font-weight: 800; letter-spacing: -.025em; text-wrap: balance; }
+.home-hl em { font-style: normal; color: var(--brand); white-space: nowrap; }
+.home-hl .line-tag { display: inline-block; padding: 0 8px; border-radius: 8px; background: var(--brand-fill, var(--brand)); color: var(--on-brand-fill, #fff);
+  font-size: 22px; line-height: 30px; vertical-align: 3px; letter-spacing: 0; }
+.home-next:active { opacity: .7; }
+
+/* Lista solta (sem card) e aviso em faixa */
+.list.plain { padding: 0; }
+.list.plain > .item { padding: 14px 0; }
+.list.plain > .item + .item { border-top-color: var(--line-soft); }
+.notice-line { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 0; text-align: left; font-size: 14px; line-height: 20px;
+  color: var(--ink-2); border-top: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); }
+.notice-line > .ms:first-child { color: var(--brand); }
+.notice-line .chev { color: var(--line); }
 
 /* Categoria: foto do carro, lugares, pagamento */
 [data-pick] .car { width: 64px; height: 36px; object-fit: cover; border-radius: 8px; flex: none; }
@@ -505,11 +543,15 @@ body.is-offline [data-go="s09"], body.is-offline [data-go="s10"], body.is-offlin
 [data-pick] > .card + .card { margin-top: 0; }
 
 /* =====================================================================
-   Pila Verde — gamificação (inspirada no programa de Santiago/RS)
+   Favos — gamificação (Ijuí, a "Colmeia do Trabalho")
    ===================================================================== */
-.pila-coin { width: 40px; height: 40px; border-radius: 50%; flex: none; display: grid; place-items: center;
-  background: radial-gradient(circle at 35% 30%, #C8F9D8, #5FD394 60%, #2E9E63); color: #00522F; font-weight: 800; font-size: 18px;
-  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .45), 0 2px 6px rgba(0, 82, 47, .25); }
+/* Favo hexagonal cor de mel com folha: a cor de apoio fica só no Favo */
+.pila-coin { --pila-gold: #E8A317; width: 40px; height: 40px; flex: none; display: grid; place-items: center;
+  clip-path: polygon(50% 0, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
+  background: radial-gradient(circle at 50% 40%, #FFE9A8, #F5C04A 55%, #D99412); color: #00522F; }
+.pila-coin::before { content: ""; width: 55%; height: 55%; background: currentColor; transform: rotate(35deg);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 1.5c5.2 3.6 7.3 8.3 6.2 12.9-.8 3.4-3.3 5.9-6.2 7.6-2.9-1.7-5.4-4.2-6.2-7.6C4.7 9.8 6.8 5.1 12 1.5zM11.35 7h1.3v13h-1.3z'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 1.5c5.2 3.6 7.3 8.3 6.2 12.9-.8 3.4-3.3 5.9-6.2 7.6-2.9-1.7-5.4-4.2-6.2-7.6C4.7 9.8 6.8 5.1 12 1.5zM11.35 7h1.3v13h-1.3z'/%3E%3C/svg%3E") center / contain no-repeat; }
 .pila-mini { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; padding: 14px 16px; }
 .pila-mini.earned { background: var(--brand-soft); border-color: transparent; box-shadow: none; }
 .pila-mini.earned .pila-coin { animation: coin 1s var(--ease) .4s both; }
@@ -535,3 +577,46 @@ body.is-offline [data-go="s09"], body.is-offline [data-go="s10"], body.is-offlin
 .redeem button.locked { opacity: .5; }
 .redeem button.locked .cost::after { content: " • saldo insuficiente"; font-weight: 600; color: var(--ink-3); }
 .stats > button { background: var(--card); padding: 14px 8px; text-align: center; }
+
+/* =====================================================================
+   Tema claro com as cores de Ijuí
+   Estrutura no estilo Brasil em Gráficos: fundo branco, cards só com borda,
+   botão principal na cor do texto (azul-marinho da marca "Ijuí").
+   Destaques: verde, azul e vermelho do brasão; laranja da marca; dourado da colmeia (favos).
+   ===================================================================== */
+:root {
+  --bg: #FFFFFF;
+  --card: #FFFFFF;
+  --soft: #F3F4F7;
+  --neutral-soft: #F3F4F7;
+  --ink: #1F2B4D;         /* Azul-marinho do logotipo "Ijuí" */
+  --ink-2: #4A5571;
+  --ink-3: #697390;
+  --brand: #12803A;       /* Verde do brasão, escurecido para ler no branco */
+  --brand-2: #D3F2DE;
+  --brand-soft: #E7F6EC;
+  --link: #1769AA;        /* Azul do brasão */
+  --info-bg: #E7F1FA;
+  --warn: #B4440E;        /* Laranja da marca */
+  --alert-bg: #FDECDF;
+  --err: #C8262C;         /* Vermelho do brasão */
+  --err-bg: #FCE4E5;
+  --line: #D5D9E1;
+  --line-soft: #E8EBF0;
+  --shadow: none;
+}
+.card { border-color: var(--line-soft); }
+/* Botões principais e seleções na cor do texto, como na referência */
+.btn.primary, .seg .chip.on, .choices button.on, .chip.dark { background: var(--brand-fill); color: var(--on-brand-fill); box-shadow: none; }
+.search.primary { box-shadow: none; }
+
+/* ---------- Telas novas: pagamentos, adicionar local, ajuda ---------- */
+input.input.field { width: 100%; height: 52px; border: 0; border-radius: 12px; background: var(--soft); padding: 0 14px; font: inherit; font-size: 15px; color: var(--ink); outline: none; }
+.pay-check { color: var(--brand); opacity: 0; transform: scale(.6); transition: opacity .2s, transform .2s var(--ease); }
+.on-pay .pay-check { opacity: 1; transform: none; }
+.faq .faq-q { display: block; padding: 0; }
+.faq .faq-q > button { display: flex; align-items: center; width: 100%; gap: 12px; padding: 16px; text-align: left; color: inherit; }
+.faq .faq-q .chev { transition: transform .3s var(--ease); }
+.faq .faq-q.open .chev { transform: rotate(180deg); }
+.faq .faq-q p { margin: 0; padding: 0 16px; max-height: 0; overflow: hidden; transition: max-height .35s var(--ease), padding .35s; }
+.faq .faq-q.open p { padding-bottom: 16px; }

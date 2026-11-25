@@ -27,7 +27,8 @@
     s01: "Início", s02: "Rotas", s03: "Linha 03", s04: "Pontos", s05: "Ao vivo", s06: "Corrida", s07: "Avaliar corrida",
     s08: "Viagem concluída", s09: "Pedir carro", s10: "Categoria", s11: "Buscando", s12: "Seu motorista",
     s14: "Alertas", s15: "Perfil", s16: "Modo motorista", s17: "Sem motoristas",
-    s18: "Corrida cancelada", s19: "Corrida agendada", s20: "Pila Verde",
+    s18: "Corrida cancelada", s19: "Corrida agendada", s20: "Favos",
+    s21: "Bicicleta", s22: "Segurança", s23: "Pagamentos", s24: "Adicionar local", s25: "Ajuda",
   };
   const DEFAULT_STATE = { ...state };
   const saved = () => JSON.parse(localStorage.getItem(KEY) || "[]");

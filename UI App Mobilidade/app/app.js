@@ -116,7 +116,7 @@ function toast(msg) {
 
 // ---------- Estado compartilhado entre as telas ----------
 // O que a pessoa escolhe numa tela aparece nas seguintes (destino, categoria, preço, horário).
-const state = { dest: "Campus UNIJUÍ", destFull: "Campus UNIJUÍ • Portão 01", cat: "Move Pop", price: 14.5, when: "Agora", time: "09:00", cancelBy: "driver", arrived: false, pila: 38 };
+const state = { dest: "Campus UNIJUÍ", destFull: "Campus UNIJUÍ • Portão 01", cat: "Move Pop", price: 14.5, when: "Agora", time: "09:00", cancelBy: "driver", arrived: false, pila: 38, pay: "Cartão Move Estudante", saldo: 24 };
 
 // Tela 12 tem dois momentos: o motorista vem vindo, depois chega. A troca é na mesma tela.
 function setArrived(on) {
@@ -129,7 +129,7 @@ const money = v => "R$ " + v.toFixed(2).replace(".", ",");
 function render() {
   const val = {
     dest: state.dest, "dest-full": state.destFull, cat: state.cat, time: state.time,
-    price: money(state.price), base: money(state.price + 2),
+    price: money(state.price), base: money(state.price + 2), pay: state.pay,
     when: state.when === "Agora" ? "agora" : "hoje às " + state.time,
   };
   $$("[data-s]").forEach(el => { if (val[el.dataset.s] !== undefined) el.textContent = val[el.dataset.s]; });
@@ -137,8 +137,10 @@ function render() {
   $$("[data-cancel]").forEach(el => { el.style.display = el.dataset.cancel === state.cancelBy ? "" : "none"; });
   $$(".chip[data-when]").forEach(c => c.classList.toggle("on", c.dataset.when === state.when));
   $$(".chip[data-dest]").forEach(c => c.classList.toggle("on", c.dataset.dest.split("|")[0] === state.dest));
+  $$("[data-pay] .item").forEach(c => c.classList.toggle("on-pay", c.dataset.name === state.pay));
+  $$("[data-saldo]").forEach(el => { el.textContent = state.saldo.toFixed(2).replace(".", ","); });
   $$("[data-pick] .card").forEach(c => c.classList.toggle("on-pick", c.dataset.name === state.cat));
-  // Pila Verde: saldo, quanto falta para "Árvore" (50) e o que já dá para trocar
+  // Favos: saldo, quanto falta para "Árvore" (50) e o que já dá para trocar
   $$("[data-pila]").forEach(el => { el.textContent = state.pila; });
   $$("[data-pila-next]").forEach(el => { el.textContent = Math.max(0, 50 - state.pila); });
   $$("[data-pila-bar]").forEach(el => { el.style.width = Math.min(100, state.pila / 50 * 100) + "%"; });
@@ -157,7 +159,7 @@ function applyTheme(pref = (THEMES[URL_THEME] && URL_THEME) || localStorage.getI
   const dark = pref === "dark" || (pref === "auto" && darkMQ.matches);
   if (animate) { root.classList.add("theme-anim"); setTimeout(() => root.classList.remove("theme-anim"), 400); }
   root.classList.toggle("dark", dark);
-  $('meta[name="theme-color"]').content = dark ? "#0B1C30" : "#F8F9FF";
+  $('meta[name="theme-color"]').content = dark ? "#000000" : "#FFFFFF";
   $$('[data-s="theme"]').forEach(el => { el.textContent = THEMES[pref]; });
 }
 function setTheme(pref) { localStorage.setItem(THEME_KEY, pref); applyTheme(pref, true); }
@@ -203,9 +205,12 @@ document.addEventListener("click", e => {
   }
   if (a === "redeem") {
     const cost = +t.dataset.cost;
-    if (cost > state.pila) return toast(`Faltam ${cost - state.pila} pilas para essa troca`);
-    state.pila -= cost; render(); toast(`${t.dataset.msg} • −${cost} pilas`);
+    if (cost > state.pila) return toast(`Faltam ${cost - state.pila} favos para essa troca`);
+    state.pila -= cost; render(); toast(`${t.dataset.msg} • −${cost} favos`);
   }
+  if (a === "topup") { state.saldo += 20; render(); toast("Recarga de R$ 20,00 feita no cartão"); }
+  if (a === "faq") { const q = t.parentElement, open = q.classList.toggle("open"); const p = q.querySelector("p"); p.style.maxHeight = open ? p.scrollHeight + 16 + "px" : "0"; }
+  if (a === "add-place") return addPlace();
   if (a === "reconnect") { setOffline(false); toast("Conectado de novo"); }
   if (a === "decline") { stopRing(); $("[data-request]").style.display = "none"; $("[data-waiting]").style.display = ""; }
 });
@@ -248,6 +253,29 @@ pick.addEventListener("click", e => {
   state.cat = c.dataset.name; state.price = +c.dataset.price;
   render();
 });
+
+// Forma de pagamento (tela 23): a escolha aparece na categoria, na avaliação e no perfil
+$("[data-pay]").addEventListener("click", e => {
+  const c = e.target.closest(".item"); if (!c) return;
+  state.pay = c.dataset.name; render(); toast(`Pagamento: ${state.pay}`);
+});
+
+// Adicionar local (tela 24): sugestões preenchem o formulário; salvar entra na lista do perfil
+$$("[data-fill]").forEach(b => b.addEventListener("click", () => {
+  const [n, ad] = b.dataset.fill.split("|"); $("#place-name").value = n; $("#place-addr").value = ad;
+}));
+function addPlace() {
+  const name = $("#place-name").value.trim(), addr = $("#place-addr").value.trim();
+  if (!name || !addr) return toast("Preencha nome e endereço");
+  const icon = $("[data-place-type] .chip.on").dataset.icon;
+  const it = document.createElement("button");
+  it.className = "item"; it.dataset.go = "s02"; it.dataset.dest = `${name}|${name} • ${addr}`;
+  it.innerHTML = `<span class="icon-sq"><span class="ms">${icon}</span></span><div class="grow"><div class="sb"></div><div class="small muted"></div></div><span class="ms chev">chevron_right</span>`;
+  $(".sb", it).textContent = name; $(".small", it).textContent = addr;
+  $("[data-places]").appendChild(it);
+  toast(`${name} salvo nos seus locais`);
+  back("s15");
+}
 
 // Inverter origem/destino
 function swapRoute() {

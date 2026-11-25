@@ -70,7 +70,7 @@
   #caption .title { font-size:20px; font-weight:600; margin-top:4px; letter-spacing:-.01em; }
   #caption > * { transition:opacity .25s, transform .35s var(--ease); }
   #caption.swap > * { opacity:0; transform:translateY(6px); }
-  #phone { position:relative; border-radius:52px; background:#0b1c30; padding:12px; box-shadow:0 2px 0 #ffffff14 inset, 0 40px 80px -20px #0b1c3047, 0 12px 24px -12px #0b1c3033; }
+  #phone { position:relative; border-radius:52px; background:#000; padding:12px; box-shadow:0 2px 0 #ffffff14 inset, 0 40px 80px -20px #0b1c3047, 0 12px 24px -12px #0b1c3033; }
   #viewport { width:390px; height:844px; overflow:hidden; border-radius:40px; background:#F8F9FF; transform-origin:0 0; }
   #viewport iframe { width:390px; height:844px; border:0; display:block; }
 
@@ -242,7 +242,8 @@ const S = {
   s01: "Início", s02: "Rotas", s03: "Linha 03", s05: "Ao vivo", s08: "Viagem concluída",
   s09: "Pedir carro", s10: "Categoria", s11: "Buscando motorista", s12: "Seu motorista", s06: "Corrida em andamento", s07: "Avaliar corrida",
   s04: "Pontos", s14: "Alertas", s15: "Perfil", s16: "Modo motorista",
-  s19: "Corrida agendada", s17: "Sem motoristas", s18: "Corrida cancelada", s20: "Pila Verde",
+  s19: "Corrida agendada", s17: "Sem motoristas", s18: "Corrida cancelada", s20: "Favos",
+  s21: "Bicicleta", s22: "Segurança", s23: "Pagamentos", s24: "Adicionar local", s25: "Ajuda",
 };
 // Uma frase por tela, mostrada ao lado do celular
 const D = {
@@ -250,7 +251,7 @@ const D = {
   s02: "Compara ônibus, carro e bicicleta por tempo e preço.",
   s03: "Itinerário passo a passo antes de sair.",
   s05: "O ônibus anda no mapa real; aviso antes de descer.",
-  s08: "Resumo da viagem e recompensa em Pila Verde.",
+  s08: "Resumo da viagem e recompensa em favos.",
   s09: "Destino e horário: agora ou agendado.",
   s10: "Rota no mapa, categorias com foto, pagamento acima do botão.",
   s11: "Busca com tempo visível e opção de cancelar.",
@@ -259,17 +260,23 @@ const D = {
   s07: "Avaliação rápida com elogios e gorjeta opcional.",
   s04: "Pontos próximos com os ônibus chegando.",
   s14: "Atrasos e obras com alternativa sugerida.",
-  s15: "Saldo de pilas, locais salvos e conta.",
+  s15: "Saldo de favos, locais salvos e conta.",
   s16: "Pedido de corrida com tempo para aceitar.",
   s19: "Confirmação do agendamento.",
   s17: "Categoria lotada: sugere outra opção ou ônibus.",
   s18: "Cancelamento sem cobrança e próximo passo.",
-  s20: "Gamificação inspirada no Pila Verde de Santiago: ganhe andando de ônibus, bike ou a pé e troque por passagem, desconto ou árvore.",
+  s21: "Bike compartilhada: estação, vagas, ciclofaixa e favos ganhos.",
+  s22: "Central de Segurança: compartilhar trajeto, contatos de confiança e 190.",
+  s23: "Saldo do cartão, recarga e escolha da forma de pagamento.",
+  s24: "Salvar um local com tipo, nome e endereço.",
+  s25: "Perguntas frequentes e contato com o suporte.",
+  s20: "Gamificação com favos (Ijuí, a Colmeia do Trabalho): ganhe andando de ônibus, bike ou a pé e troque por passagem, desconto ou árvore.",
 };
 const FLOWS = [
   ["De ônibus", ["s01", "s02", "s03", "s05", "s08"]],
   ["De carro", ["s09", "s10", "s11", "s12", "s06", "s07"]],
-  ["Abas e conta", ["s04", "s14", "s15", "s20", "s16"]],
+  ["Abas e conta", ["s04", "s14", "s15", "s20", "s16", "s23", "s24", "s25"]],
+  ["Bike e segurança", ["s21", "s22"]],
   ["Imprevistos e agendamento", ["s19", "s17", "s18"]],
 ];
 const order = FLOWS.flatMap(([, ids]) => ids);
