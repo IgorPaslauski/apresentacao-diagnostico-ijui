@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Diagnóstico — Mobilidade Urbana Inteligente para Ijuí</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#090b0a; --bg2:#111411; --ink:#f7f3ea; --muted:#aaa69d; --soft:#ede7dc;
+  --line:rgba(247,243,234,.14); --line2:rgba(247,243,234,.24); --accent:#c8744e; --accent2:#719172;
+  --paper:#f3eee4; --paperInk:#10120f; --paperMuted:#58584f; --paperLine:rgba(16,18,15,.16);
+  --sans:"Plus Jakarta Sans",Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box} html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(900px 520px at 77% 18%,rgba(200,116,78,.18),transparent 58%),radial-gradient(800px 580px at 8% 83%,rgba(113,145,114,.15),transparent 60%),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(0deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:auto,auto,80px 80px,80px 80px;opacity:.92}
+body::after{content:"";position:fixed;inset:-60px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.74' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E");mix-blend-mode:overlay;opacity:.075}
+.deck{position:relative;width:100vw;height:100vh;perspective:1400px}
+.slide{position:absolute;inset:0;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));gap:22px;padding:64px 74px;opacity:0;filter:blur(10px);transform:translateY(34px) scale(.985);pointer-events:none;transition:opacity .62s ease,transform .82s cubic-bezier(.16,1,.3,1),filter .62s ease}
+.slide.active{opacity:1;filter:blur(0);transform:translateY(0) scale(1);pointer-events:auto;z-index:5}
+.slide.prev{transform:translateX(-44px) scale(.985);opacity:0}
+.slide.next{transform:translateX(44px) scale(.985);opacity:0}
+.paper{background:linear-gradient(180deg,var(--paper),#ebe4d7);color:var(--paperInk)}
+.progressWrap{position:fixed;left:0;right:0;top:0;height:4px;background:rgba(255,255,255,.06);z-index:30}
+.progress{height:100%;width:0;background:var(--accent);transition:width .35s ease}
+.counter{position:fixed;right:36px;top:24px;z-index:31;font:600 12px var(--mono);letter-spacing:.12em;color:rgba(247,243,234,.46)}
+.brand{position:fixed;left:36px;top:24px;z-index:31;font:700 11px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:rgba(247,243,234,.46)}
+body:has(.slide.paper.active) .counter,body:has(.slide.paper.active) .brand{color:rgba(16,18,15,.42)}
+h1,h2,h3,p{margin:0}
+h1{font-size:clamp(76px,8.8vw,154px);line-height:.83;letter-spacing:-.08em;font-weight:800}
+h2{font-size:clamp(40px,4.8vw,86px);line-height:.9;letter-spacing:-.066em;font-weight:800}
+h3{font-size:clamp(26px,2.7vw,45px);line-height:.98;letter-spacing:-.045em;font-weight:760}
+.kicker{font:700 12px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--accent);display:flex;gap:14px;align-items:center}
+.kicker:before{content:"";width:42px;height:1px;background:currentColor}
+.paper .kicker{color:#9d4f34}
+.lead{font-size:clamp(23px,2.1vw,34px);line-height:1.16;letter-spacing:-.034em;color:rgba(247,243,234,.76);max-width:900px}
+.paper .lead{color:rgba(16,18,15,.72)}
+.body{font-size:clamp(17px,1.22vw,22px);line-height:1.42;color:rgba(247,243,234,.64);max-width:760px}
+.small{font:500 13px/1.45 var(--mono);letter-spacing:.035em;color:rgba(247,243,234,.48)}
+.paper .small{color:rgba(16,18,15,.48)}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .72s ease,transform .72s cubic-bezier(.16,1,.3,1)}
+.active .reveal{opacity:1;transform:none}
+.active .d1{transition-delay:.08s}.active .d2{transition-delay:.16s}.active .d3{transition-delay:.24s}.active .d4{transition-delay:.32s}.active .d5{transition-delay:.40s}
+.coverTitle{grid-column:1/8;grid-row:2/7;display:flex;flex-direction:column;justify-content:center;gap:30px}
+.coverPanel{grid-column:8/13;grid-row:1/9;position:relative;border-left:1px solid var(--line);overflow:hidden}
+.mapSystem{position:absolute;inset:-12% -18%;opacity:.9}
+.mapSystem path.route{stroke-dasharray:1400;stroke-dashoffset:1400}
+.active .mapSystem path.route{animation:dash 2.35s cubic-bezier(.16,1,.3,1) .2s forwards}
+@keyframes dash{to{stroke-dashoffset:0}}
+.station{animation:pulse 2.1s infinite;transform-origin:center}
+@keyframes pulse{50%{r:11;opacity:.25}}
+.coverMeta{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:690px;border-top:1px solid var(--line);padding-top:24px}
+.coverMeta span{font:600 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:rgba(247,243,234,.56)}
+.routeLabel{position:absolute;right:48px;bottom:48px;left:48px;display:grid;gap:10px}
+.routeLabel strong{font-size:28px;letter-spacing:-.04em}
+.routeLabel span{font:600 12px var(--mono);letter-spacing:.12em;color:rgba(247,243,234,.54);text-transform:uppercase}
+.headRow{grid-column:1/13;grid-row:1/2;display:flex;flex-direction:column;justify-content:end;gap:12px}
+.headRow.tall{grid-row:1/3}
+.empathyHead{flex-direction:row;align-items:end;justify-content:space-between}
+.headlineSplit{grid-column:1/8;grid-row:2/7;display:flex;flex-direction:column;justify-content:center;gap:28px}
+.demandGrid{grid-column:1/13;grid-row:3/9;display:grid;grid-template-columns:1.12fr 1fr 1fr;gap:18px}
+.demandCard{border:1px solid var(--line);padding:28px;display:flex;flex-direction:column;justify-content:space-between;background:rgba(247,243,234,.03)}
+.demandCard b{font:800 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.demandCard h3{font-size:clamp(26px,2.2vw,38px);margin:18px 0 14px}
+.demandCard p,.demandCard li{font-size:clamp(16px,1.12vw,20px);line-height:1.38;color:rgba(247,243,234,.7)}
+.demandCard ul{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.demandCard li{padding-left:18px;position:relative}
+.demandCard li:before{content:"";position:absolute;left:0;top:.55em;width:8px;height:8px;border-radius:999px;background:var(--accent)}
+.docWrap{grid-column:1/13;grid-row:2/9;display:grid;grid-template-rows:1fr auto auto;gap:14px;min-height:0}
+.docGrid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:14px;min-height:0}
+.docCard{background:#fffaf0;border:1px solid var(--paperLine);padding:22px 24px;display:flex;flex-direction:column;justify-content:space-between;text-decoration:none;color:inherit;min-height:0}
+.docCard b{font:800 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#9d4f34}
+.docCard h3{font-size:clamp(22px,2vw,34px);margin:10px 0 4px;letter-spacing:-.04em}
+.docCard .expand{display:block;font:600 12px/1.3 var(--sans);letter-spacing:-.02em;color:rgba(16,18,15,.48);margin-bottom:8px}
+.docCard p{font-size:clamp(14px,1.08vw,18px);line-height:1.32;color:rgba(16,18,15,.68)}
+.docNote{font:500 13px/1.45 var(--mono);letter-spacing:.03em;color:rgba(16,18,15,.48)}
+.personaPhoto{grid-column:1/6;grid-row:2/8;position:relative;overflow:hidden;border-radius:26px;background:#151713;box-shadow:0 34px 90px rgba(0,0,0,.24)}
+.personaPhoto img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.9) contrast(1.05)}
+.personaPhoto::after{content:"LUCAS • 27 • IJUÍ";position:absolute;left:28px;bottom:28px;font:700 12px var(--mono);letter-spacing:.14em;color:#fffaf0;background:rgba(9,11,10,.58);border:1px solid rgba(255,255,255,.18);padding:11px 14px;border-radius:999px}
+.personaFacts{grid-column:6/13;grid-row:2/8;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.fact{background:#fffaf0;border:1px solid var(--paperLine);padding:28px;display:flex;flex-direction:column;justify-content:space-between;min-height:210px}
+.fact b{font:800 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#9d4f34}
+.fact p{font-size:clamp(27px,2.55vw,48px);line-height:1;letter-spacing:-.06em;color:rgba(16,18,15,.82)}
+.fact small{font-size:14px;line-height:1.35;color:rgba(16,18,15,.52);max-width:260px}
+.personaIntro{grid-column:1/13;grid-row:1/2;align-self:start;display:flex;align-items:center;justify-content:space-between}
+.personaIntro .small{max-width:520px;text-align:right}
+.empathyMap{grid-column:1/13;grid-row:2/9;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:14px;min-height:0}
+.empathyItem{background:#fffaf0;border:1px solid var(--paperLine);padding:22px 24px;display:flex;flex-direction:column;gap:12px;min-height:0}
+.empathyItem h3{font-size:clamp(18px,1.55vw,26px);letter-spacing:-.04em}
+.empathyItem ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.empathyItem li{font-size:clamp(14px,1.05vw,18px);line-height:1.3;letter-spacing:-.02em;color:rgba(16,18,15,.68);padding-left:16px;position:relative}
+.empathyItem li:before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;border-radius:999px;background:#9d4f34}
+.empathyItem.pain{background:#111411;color:#f7f3ea;border-color:transparent}
+.empathyItem.pain h3{color:#c8744e}
+.empathyItem.pain li{color:rgba(247,243,234,.72)}
+.empathyItem.pain li:before{background:#c8744e}
+.empathyItem.need{border-color:#9d4f34}
+.personaChip{font:700 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:rgba(16,18,15,.46);border:1px solid var(--paperLine);padding:8px 12px;border-radius:999px;white-space:nowrap}
+.timeline{grid-column:1/13;grid-row:3/7;position:relative;display:grid;grid-template-columns:repeat(6,1fr);align-items:center}
+.timeline:before{content:"";position:absolute;left:5%;right:5%;top:50%;height:2px;background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),transparent)}
+.stop{position:relative;z-index:2;display:grid;gap:16px;align-content:center;text-align:center}
+.dot{width:22px;height:22px;border-radius:999px;background:var(--accent);margin:auto;box-shadow:0 0 0 10px rgba(200,116,78,.1)}
+.stop label{font:700 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.stop span{font-size:18px;line-height:1.25;color:rgba(247,243,234,.66);padding:0 8px}
+.emotion{grid-column:1/13;grid-row:7/8;align-self:end;display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.emotion div{height:4px;background:rgba(247,243,234,.13);position:relative}
+.emotion div:after{content:"";position:absolute;left:0;top:0;bottom:0;background:var(--accent);width:var(--w)}
+.network{grid-column:6/13;grid-row:1/9;position:relative}
+.network svg{position:absolute;inset:0;width:100%;height:100%}
+.network line{stroke:rgba(247,243,234,.2);stroke-width:1.2}
+.node{position:absolute;min-width:112px;text-align:center;padding:13px 15px;border:1px solid var(--line2);background:rgba(9,11,10,.88);border-radius:999px;font:700 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:rgba(247,243,234,.78)}
+.node.main{left:50%;top:50%;transform:translate(-50%,-50%);background:var(--soft);color:var(--paperInk);border-color:transparent}
+.n1{left:8%;top:16%}.n2{right:6%;top:16%}.n3{left:8%;bottom:16%}.n4{right:5%;bottom:17%}.n5{left:42%;top:6%}.n6{left:42%;bottom:6%}
+.benchWrap{grid-column:1/13;grid-row:2/9;display:grid;grid-template-rows:auto 1fr auto;gap:16px;min-height:0}
+.benchLead{font-size:clamp(22px,2.1vw,34px);line-height:1.15;letter-spacing:-.04em;font-weight:760;color:rgba(16,18,15,.78);max-width:920px}
+.benchmark{display:grid;grid-template-columns:1.45fr repeat(5,1fr);border:1px solid var(--paperLine);background:#fffaf0}
+.bcell{border-right:1px solid var(--paperLine);border-bottom:1px solid var(--paperLine);padding:12px 10px;display:flex;align-items:center;justify-content:center;text-align:center;min-height:58px}
+.bcell:nth-child(6n){border-right:0}
+.bhead{font:800 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:rgba(16,18,15,.58);background:#eee7da}
+.feat{justify-content:flex-start;text-align:left;font:800 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:rgba(16,18,15,.7);background:#f7f1e7;padding-left:16px}
+.mark{font:800 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:7px 10px;min-width:86px}
+.mark.yes{background:#9d4f34;color:#fffaf0}
+.mark.mid{background:#eee7da;color:#9d4f34;border:1px solid rgba(157,79,52,.3)}
+.mark.no{color:rgba(16,18,15,.34);border:1px solid rgba(16,18,15,.12)}
+.benchFind{border-top:1px solid var(--paperLine);padding-top:16px;display:flex;gap:16px;align-items:baseline;flex-wrap:wrap}
+.benchFind b{font:800 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#9d4f34}
+.benchFind span{font-size:clamp(18px,1.5vw,26px);line-height:1.2;letter-spacing:-.03em;color:rgba(16,18,15,.76)}
+.statement{grid-column:3/11;grid-row:2/8;display:flex;flex-direction:column;justify-content:center;gap:0}
+.statementBlock{padding:22px 0;border-top:1px solid var(--paperLine);display:grid;gap:8px}
+.statementBlock:last-child{border-bottom:1px solid var(--paperLine)}
+.statementBlock b{font:800 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#9d4f34}
+.statementBlock p{font-size:clamp(22px,2.35vw,36px);line-height:1.2;letter-spacing:-.04em;font-weight:700;color:rgba(16,18,15,.82)}
+.statementNote{margin-top:22px;font:500 13px/1.45 var(--mono);letter-spacing:.03em;color:rgba(16,18,15,.48)}
+@media(max-width:900px){
+  .slide{padding:36px;display:block;overflow:auto}
+  .coverTitle,.coverPanel,.headRow,.headlineSplit,.demandGrid,.docWrap,.personaPhoto,.personaFacts,.empathyMap,.timeline,.network,.benchWrap,.statement{display:block;margin-bottom:24px}
+  .counter,.brand{display:none}
+  .personaFacts,.empathyMap,.docGrid,.demandGrid{grid-template-columns:1fr}
+  .benchmark{overflow:auto;min-width:720px}
+  .bcell{min-height:54px}
+  .personaPhoto{height:420px}
+}
+</style>
+</head>
+<body>
+<div class="progressWrap"><div class="progress" id="progress"></div></div>
+<div class="brand">Projeto Integrador • Diagnóstico</div>
+<div class="counter" id="counter">01 / 09</div>
+<main class="deck" id="deck">
+
+<section class="slide active" data-title="Abertura">
+  <div class="coverTitle">
+    <div class="kicker reveal">Avaliação 1 • Empatia + Definição</div>
+    <h1 class="reveal d1">Mobilidade sem fricção.</h1>
+    <p class="lead reveal d2">Relatório diagnóstico: contexto da demanda, usuários de Ijuí e o problema a ser solucionado.</p>
+    <div class="coverMeta reveal d3"><span>Projeto Integrador</span><span>UNIJUÍ — universidade</span></div>
+  </div>
+  <div class="coverPanel reveal d2">
+    <svg class="mapSystem" viewBox="0 0 760 900" fill="none"><path d="M120 860C260 708 177 573 355 520C544 463 444 292 665 96" stroke="rgba(247,243,234,.16)" stroke-width="2"/><path d="M-20 202C171 195 202 335 332 351C525 375 512 612 768 658" stroke="rgba(247,243,234,.12)" stroke-width="2"/><path class="route" d="M92 760C173 702 210 639 244 567C306 434 403 415 455 326C501 247 557 195 668 144" stroke="#c8744e" stroke-width="8" stroke-linecap="round"/><circle class="station" cx="244" cy="567" r="6" fill="#f7f3ea"/><circle class="station" cx="455" cy="326" r="6" fill="#f7f3ea"/><circle class="station" cx="668" cy="144" r="6" fill="#f7f3ea"/></svg>
+    <div class="routeLabel"><span>Chegar na cidade hoje</span><strong>tempo • custo • disponibilidade</strong></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Demanda">
+  <div class="headRow tall">
+    <div class="kicker reveal">Briefing com o demandante</div>
+    <h2 class="reveal d1" style="font-size:clamp(36px,3.8vw,62px)">O parceiro pede uma forma de decidir como chegar — não só de pegar ônibus.</h2>
+  </div>
+  <div class="demandGrid reveal d2">
+    <article class="demandCard">
+      <div>
+        <b>organização / contexto</b>
+        <h3>Ijuí precisa de previsibilidade urbana.</h3>
+      </div>
+      <p>O desafio parte da cidade como território de uso cotidiano: estudo, trabalho, comércio e deslocamentos fragmentados entre ônibus, corrida e caminhada.</p>
+    </article>
+    <article class="demandCard">
+      <div>
+        <b>demanda apresentada</b>
+        <h3>Comparar opções no momento da decisão.</h3>
+      </div>
+      <p>Uma plataforma que ajude o cidadão a escolher o melhor modo de chegar ao destino com tempo, custo e disponibilidade visíveis.</p>
+    </article>
+    <article class="demandCard">
+      <div>
+        <b>dores do briefing</b>
+        <h3>A informação não está no mesmo lugar.</h3>
+      </div>
+      <ul>
+        <li>Chegada do ônibus incerta</li>
+        <li>Linhas e rotas pouco claras</li>
+        <li>Corrida e ônibus em apps separados</li>
+        <li>Preço e atraso sem comparação</li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<section class="slide paper" data-title="Pesquisa">
+  <div class="headRow empathyHead">
+    <div class="kicker reveal">Pesquisa documental</div>
+    <span class="personaChip reveal">fontes oficiais e imprensa local</span>
+  </div>
+  <div class="docWrap">
+    <div class="docGrid reveal d1">
+      <a class="docCard" href="https://ijui.rs.gov.br/noticia/4313/conselho-de-transito-aprova-reajuste-no-valor-do-transporte-publico-em-ijui/" target="_blank">
+        <div>
+          <b>regulação</b>
+          <h3>CTTMOB</h3>
+          <span class="expand">Conselho Municipal de Trânsito, Transporte e Mobilidade Urbana</span>
+        </div>
+        <p>Tarifa do ônibus urbano em R$ 6 (jul/2025). O conselho registra queda de usuários após a pandemia e reúne prefeitura, concessionária e entidades locais.</p>
+      </a>
+      <a class="docCard" href="https://radioprogresso.com.br/mtu-tera-onibus-em-horarios-diferenciados-nesta-terca-feira-de-carnaval-em-ijui/" target="_blank">
+        <div>
+          <b>operação</b>
+          <h3>Medianeira</h3>
+          <span class="expand">MTU — Medianeira Transportes Urbanos</span>
+        </div>
+        <p>Concessionária do coletivo urbano, com linhas como Modelo–Alvorada, Herval–Jardim, São Geraldo–Progresso, Glória–Cotrijuí e Lambari–Cotrijuí.</p>
+      </a>
+      <a class="docCard" href="https://www.noroesteonline.com/urmob-e-lancado-em-ijui-aplicativo-permite-acesso-aos-horarios-e-destinos-do-transporte-publico-em-tempo-real/" target="_blank">
+        <div>
+          <b>canal do ônibus</b>
+          <h3>Urmob City</h3>
+          <span class="expand">aplicativo de horários e localização do ônibus</span>
+        </div>
+        <p>Desde 2023 existe app municipal de horários e ônibus em tempo real. Ele cobre o coletivo — não a corrida nem a comparação entre modos.</p>
+      </a>
+      <a class="docCard" href="https://www.noroesteonline.com/aplicativo-de-mobilidade-rota-77-atua-em-ijui/" target="_blank">
+        <div>
+          <b>corrida local</b>
+          <h3>Rota 77</h3>
+        </div>
+        <p>App de corrida já opera em Ijuí, 24h, fora do sistema de ônibus. Tempo e preço da corrida não aparecem junto da linha urbana.</p>
+      </a>
+    </div>
+    <div class="benchFind reveal d2"><b>leitura</b><span>A cidade já tem ônibus regulado, app de coletivo e app de corrida. O que não existe é um lugar para comparar as opções.</span></div>
+    <p class="docNote reveal d3">Entrevistas e observação em campo ainda precisam confirmar a recorrência dessas dores na prática do ponto e da escolha cotidiana.</p>
+  </div>
+</section>
+
+<section class="slide paper" data-title="Benchmark">
+  <div class="headRow"><div class="kicker reveal">Benchmarking</div></div>
+  <div class="benchWrap">
+    <p class="benchLead reveal d1">Cada app resolve um pedaço. Nenhum resolve a decisão completa em Ijuí.</p>
+    <div class="benchmark reveal d2">
+      <div class="bcell bhead">O que oferece</div>
+      <div class="bcell bhead">Maps</div>
+      <div class="bcell bhead">Moovit</div>
+      <div class="bcell bhead">Urmob City</div>
+      <div class="bcell bhead">Uber / 99</div>
+      <div class="bcell bhead">Rota 77</div>
+      <div class="bcell feat">Ônibus em tempo real</div>
+      <div class="bcell"><span class="mark mid">parcial</span></div>
+      <div class="bcell"><span class="mark yes">sim</span></div>
+      <div class="bcell"><span class="mark yes">sim</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell feat">Corrida por aplicativo</div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark yes">sim</span></div>
+      <div class="bcell"><span class="mark yes">sim</span></div>
+      <div class="bcell feat">Comparar ônibus e corrida</div>
+      <div class="bcell"><span class="mark mid">parcial</span></div>
+      <div class="bcell"><span class="mark mid">parcial</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell feat">Dados reais de Ijuí</div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark no">não</span></div>
+      <div class="bcell"><span class="mark yes">sim</span></div>
+      <div class="bcell"><span class="mark mid">parcial</span></div>
+      <div class="bcell"><span class="mark yes">sim</span></div>
+    </div>
+    <div class="benchFind reveal d3"><b>leitura</b><span>A lacuna é a integração: ônibus, corrida e contexto local não aparecem juntos.</span></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Stakeholders">
+  <div class="headlineSplit">
+    <div class="kicker reveal">Mapa de stakeholders</div>
+    <h2 class="reveal d1">O cidadão decide no centro de um ecossistema.</h2>
+    <p class="body reveal d2">Prefeitura, CTTMOB (conselho municipal de mobilidade), Medianeira (transporte coletivo), apps de corrida e motoristas condicionam a experiência — mas não conversam entre si.</p>
+  </div>
+  <div class="network reveal d2">
+    <svg viewBox="0 0 700 700"><line x1="350" y1="350" x2="120" y2="160"/><line x1="350" y1="350" x2="580" y2="140"/><line x1="350" y1="350" x2="160" y2="560"/><line x1="350" y1="350" x2="540" y2="560"/><line x1="350" y1="350" x2="360" y2="70"/><line x1="350" y1="350" x2="360" y2="640"/></svg>
+    <div class="node main">cidadão</div>
+    <div class="node n1">medianeira</div>
+    <div class="node n2">rota 77 / 99</div>
+    <div class="node n3">motoristas</div>
+    <div class="node n4">comércio</div>
+    <div class="node n5">prefeitura</div>
+    <div class="node n6">cttmob</div>
+  </div>
+</section>
+
+<section class="slide paper" data-title="Persona">
+  <div class="personaIntro">
+    <div class="kicker reveal">Persona</div>
+    <p class="small reveal d1">Provisória, a partir do briefing. Precisa ser confrontada com entrevistas e observação.</p>
+  </div>
+  <div class="personaPhoto reveal d1"><img alt="Retrato ilustrativo da persona Lucas" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 1100'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop stop-color='%23e9dfcf'/%3E%3Cstop offset='.48' stop-color='%23c8a889'/%3E%3Cstop offset='1' stop-color='%2310110e'/%3E%3C/linearGradient%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3CclipPath id='c'%3E%3Crect width='900' height='1100' rx='26'/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path='url(%23c)'%3E%3Crect width='900' height='1100' fill='url(%23bg)'/%3E%3Cpath d='M-20 860 C 150 700, 305 675, 505 718 C 663 753, 773 711, 930 589 L 930 1120 L -20 1120 Z' fill='%2311120f'/%3E%3Ccircle cx='468' cy='332' r='142' fill='%2323211c'/%3E%3Cpath d='M292 927 C 314 720, 366 544, 470 540 C 596 536, 650 735, 680 927 Z' fill='%2323211c'/%3E%3Cpath d='M331 270 C 391 152, 550 151, 622 270 C 558 226, 464 223, 331 270 Z' fill='%2311120f'/%3E%3Cpath d='M338 491 C 414 546, 517 551, 603 491 C 584 603, 363 610, 338 491 Z' fill='%23c8744e' opacity='.28'/%3E%3Cpath d='M112 130 L 795 1010' stroke='%23fffaf0' stroke-width='1.5' opacity='.14'/%3E%3Cpath d='M66 252 L 705 1028' stroke='%23fffaf0' stroke-width='1.5' opacity='.09'/%3E%3Crect width='900' height='1100' filter='url(%23grain)' opacity='.12' mix-blend-mode='multiply'/%3E%3C/g%3E%3C/svg%3E" /></div>
+  <div class="personaFacts">
+    <div class="fact reveal d2"><b>perfil</b><p>Lucas, 27</p><small>Trabalha e estuda em Ijuí.</small></div>
+    <div class="fact reveal d3"><b>rotina</b><p>Vários deslocamentos</p><small>Circula ao longo do dia, com pouco tempo para decidir.</small></div>
+    <div class="fact reveal d4"><b>comportamento</b><p>Escolhe por contexto</p><small>Ônibus, corrida, carro ou caminhada, conforme o momento.</small></div>
+    <div class="fact reveal d5"><b>necessidade</b><p>Decidir rápido</p><small>Ver tempo, custo e disponibilidade juntos.</small></div>
+  </div>
+</section>
+
+<section class="slide paper" data-title="Empatia">
+  <div class="headRow empathyHead">
+    <div class="kicker reveal">Mapa de empatia</div>
+    <span class="personaChip reveal">Lucas • 27 • hipótese do briefing</span>
+  </div>
+  <div class="empathyMap reveal d1">
+    <article class="empathyItem">
+      <h3>Vê</h3>
+      <ul>
+        <li>Apps de corrida, mapa e horário abertos ao mesmo tempo</li>
+        <li>Ponto sem previsão de quando o ônibus passa</li>
+        <li>Preço da corrida mudando na tela</li>
+      </ul>
+    </article>
+    <article class="empathyItem">
+      <h3>Ouve</h3>
+      <ul>
+        <li>“O ônibus atrasou de novo”</li>
+        <li>Dica no grupo da turma ou de quem está no ponto</li>
+        <li>Motorista falando de cancelamento e demanda</li>
+      </ul>
+    </article>
+    <article class="empathyItem">
+      <h3>Fala e faz</h3>
+      <ul>
+        <li>“Vou ver se dá tempo”</li>
+        <li>Alterna Maps, ônibus e Rota 77 / 99</li>
+        <li>Troca de ônibus para corrida se estiver atrasado</li>
+      </ul>
+    </article>
+    <article class="empathyItem">
+      <h3>Pensa e sente</h3>
+      <ul>
+        <li>“Chego no horário sem gastar demais?”</li>
+        <li>Pressa, incerteza e pouco controle sobre o tempo</li>
+        <li>Medo de perder aula ou o trabalho</li>
+      </ul>
+    </article>
+    <article class="empathyItem pain">
+      <h3>Dores</h3>
+      <ul>
+        <li>Informação espalhada em vários lugares</li>
+        <li>Espera sem previsibilidade</li>
+        <li>Comparar tempo e custo na mão, tarde demais</li>
+      </ul>
+    </article>
+    <article class="empathyItem need">
+      <h3>Necessidades</h3>
+      <ul>
+        <li>Ver tempo, custo e disponibilidade juntos</li>
+        <li>Confiar que a opção escolhida vai acontecer</li>
+        <li>Decidir rápido, no contexto de agora</li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<section class="slide" data-title="Jornada">
+  <div class="headlineSplit" style="grid-column:1/13;grid-row:1/3">
+    <div class="kicker reveal">Jornada do usuário</div>
+    <h2 class="reveal d1" style="font-size:clamp(36px,3.8vw,64px)">Uma viagem simples vira uma sequência de decisões soltas.</h2>
+  </div>
+  <div class="timeline reveal d2">
+    <div class="stop"><label>necessidade</label><div class="dot"></div><span>precisa sair</span></div>
+    <div class="stop"><label>pesquisa</label><div class="dot"></div><span>abre várias fontes</span></div>
+    <div class="stop"><label>compara</label><div class="dot"></div><span>tempo e custo à mão</span></div>
+    <div class="stop"><label>espera</label><div class="dot"></div><span>sem certeza</span></div>
+    <div class="stop"><label>viaja</label><div class="dot"></div><span>acompanha pela metade</span></div>
+    <div class="stop"><label>chega</label><div class="dot"></div><span>sem feedback</span></div>
+  </div>
+  <div class="emotion reveal d3">
+    <div style="--w:45%"></div>
+    <div style="--w:68%"></div>
+    <div style="--w:80%"></div>
+    <div style="--w:92%"></div>
+    <div style="--w:62%"></div>
+    <div style="--w:38%"></div>
+  </div>
+</section>
+
+<section class="slide paper" data-title="Problema">
+  <div class="headRow"><div class="kicker reveal">Problem Statement</div></div>
+  <div class="statement">
+    <div class="statementBlock reveal d1"><b>quem</b><p>Cidadãos de Ijuí que se deslocam no dia a dia.</p></div>
+    <div class="statementBlock reveal d2"><b>precisa</b><p>De uma forma simples e confiável de decidir como chegar ao destino.</p></div>
+    <div class="statementBlock reveal d3"><b>porque</b><p>Tempo, custo, disponibilidade e rota aparecem hoje de forma fragmentada.</p></div>
+    <p class="statementNote reveal d4">Síntese do briefing, da pesquisa documental e do benchmarking. A validação em campo deve confirmar a recorrência dessas dores.</p>
+  </div>
+</section>
+
+</main>
+<script>
+const slides=[...document.querySelectorAll('.slide')];let current=0;const progress=document.getElementById('progress'),counter=document.getElementById('counter');
+function show(i){current=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,idx)=>{s.classList.toggle('active',idx===current);s.classList.toggle('prev',idx<current);s.classList.toggle('next',idx>current)});progress.style.width=((current+1)/slides.length*100)+'%';counter.textContent=String(current+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');location.hash='s'+(current+1)}
+function next(){show(current+1)}function prev(){show(current-1)}
+document.addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();next()}if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();prev()}if(e.key.toLowerCase()==='f'){document.documentElement.requestFullscreen?.()}});
+document.addEventListener('click',e=>{if(e.target.closest('a'))return; if(e.clientX>innerWidth/2)next(); else prev()});
+const m=location.hash.match(/s(\d+)/);if(m)current=(+m[1]-1)||0;show(current);
+</script>
+</body>
+</html>
